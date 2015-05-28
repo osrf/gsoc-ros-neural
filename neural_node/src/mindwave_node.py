@@ -1,4 +1,4 @@
-import serial, time, binascii
+import serial, time, binascii, threading
 
 # protocol
 SYNC            = '\xaa'
@@ -19,24 +19,47 @@ MINDWAVE_DISCONNECTED   = '\xd2'
 MINDWAVE_REQUESTDENIED  = '\xd3'
 MINDWAVE_STANDBY        = '\xd4'
 
-MINDWAVE_STATUS_CONNECTED        = 0
+MINDWAVE_STATUS_CONNECTED       = 0
 MINDWAVE_STATUS_NOFOUND         = 1
 MINDWAVE_STATUS_DISCONNECTED    = 2
 MINDWAVE_STATUS_DENIED          = 3
 MINDWAVE_STATUS_STANDBY         = 4
 
+
+class DongleReader(threading.Thread):
+    def __init__(self, parser, *args, **kargs):
+        self.parser = parser
+        self.running = True
+        super(DongleReader, self).__init__(*args, **kwargs)
+    
+    def run(self):
+        while True:
+            pass        
+    def stop(self):
+        self.running = False
+        self._Thread__stop()
+
 class Mindwave(object):
 
-    def __init__(self, dev, headset_id=None):
+    def __init__(self, dev, headset_id=None, baudrate=115200):
         
+        if headset_id:
+            self.id = headset_id
+            self.auto_connect = True
+        else:
+            self.id = headset_id
+            self.auto_connect = False
+
         self.device = dev
-        self.id = headset_id
+        self.baudrate = baudrate
+
         self.meditation = 0 # 0-100
         self.attention = 0 # 0-100
         self.signal = 0
         self.status = None
         self.serial = None
         self.package = []
+
         self.open()
 
     def debug_hex(self, value):
@@ -44,9 +67,9 @@ class Mindwave(object):
 
     def open(self):
         if not self.serial or not self.serial.IsOpen():
-            self.serial = serial.Serial(self.device, baudrate=115200, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE,
-                bytesize=serial.EIGHTBITS, writeTimeout=0, timeout=3, rtscts=True, xonxoff=False)
-            #self.serial = serial.Serial(self.device, 115200)
+            #self.serial = serial.Serial(self.device, baudrate=115200, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE,
+            #    bytesize=serial.EIGHTBITS, writeTimeout=0, timeout=3, rtscts=True, xonxoff=False)
+            self.serial = serial.Serial(self.device, self.baudrate, timeout=0.001)
 
     def close(self):
         self.serial.close()
@@ -93,60 +116,74 @@ class Mindwave(object):
         payload = payload[1:] 
         
         self.package.append(code)
-
-        if code == MINDWAVE_CONNECTED:
-            self.status = MINDWAVE_STATUS_CONNECTED
-            vlength = payload[0]
-            self.package.append(vlength)
-            self.package.append( payload[1])
-            self.package.append( payload[2])
-            
-            print 'connected'  # 2 byte to headset id 
-        
-        elif code == MINDWAVE_DISCONNECTED: # dongle send 4 bytes
-            self.status = MINDWAVE_STATUS_DISCONNECTED
-            vlength = payload[0]
-            self.package.append(vlength)
-            self.package.append( payload[1])
-            self.package.append( payload[2])
-
-        elif code == MINDWAVE_STANDBY: # waiting for a command the device send a byte 0x00
-            self.status = MINDWAVE_STATUS_STANDBY
-            vlength = payload[0]
-            value = payload[1]
-            self.package.append(vlength)
-            self.package.append(value)
-              
-        elif code == MINDWAVE_NOFOUND:  # it can be 0 or 2 bytes
-            self.status = MINDWAVE_STATUS_NOFOUND
-            vlength = payload[0]
-            self.package.append(vlength)
-            
-            if ord(vlength)== 2:
+        if code >= 0x80:
+            if code == MINDWAVE_CONNECTED:
+                # headset found
+                # format: 0xaa 0xaa 0x04 0xd0 0x02 0x05 0x05 0x23
+                self.status = MINDWAVE_STATUS_CONNECTED
+                vlength = payload[0]
+                self.package.append(vlength)
                 self.package.append( payload[1])
                 self.package.append( payload[2])
-            else:
-                pass
+                     
+            elif code == MINDWAVE_NOFOUND:  # it can be 0 or 2 bytes
+                # headset no found
+                # format: 0xaa 0xaa 0x04 0xd1 0x02 0x05 0x05 0xf2
 
-        elif code == MINDWAVE_REQUESTDENIED:
-            self.status = MINDWAVE_STATUS_DENIED
-            vlength = payload[0]
-            self.package.append(vlength)
-              
-        else:
-            # single byte there isn't vlength
-            if code < 0x80: # 0-127 
-                byte, payload = ord(payload[0]), payload[1:0]
-
-                if code == POOR_SIGNAL:
-                    self.signal = byte
-                elif code == ATTENTION:
-                    self.attention = byte
-                elif code == MEDITATION:
-                    self.meditation = byte
-
-            else: # multiple byte 
+                self.status = MINDWAVE_STATUS_NOFOUND
                 vlength = payload[0]
+                self.package.append(vlength)
+                
+                # 0xAA 0xAA 0x02 0xD1 0x00 0xD9
+                if ord(vlength) == 2:
+                    self.package.append( payload[1])
+                    self.package.append( payload[2])
+                else:
+                    pass
+
+            elif code == MINDWAVE_DISCONNECTED: # dongle send 4 bytes
+                # headset found
+                # format: 0xaa 0xaa 0x04 0xd2 0x02 0x05 0x05 0x21
+                self.status = MINDWAVE_STATUS_DISCONNECTED
+                vlength = payload[0]
+                self.package.append(vlength)
+                self.package.append( payload[1])
+                self.package.append( payload[2])
+
+            elif code == MINDWAVE_REQUESTDENIED:
+                # headset found
+                # format: 0xaa 0xaa 0x02 0xd3 0x00 0x2c
+                self.status = MINDWAVE_STATUS_DENIED
+                vlength = payload[0]
+                self.package.append(vlength)
+
+            elif code == MINDWAVE_STANDBY: # waiting for a command the device send a byte 0x00
+                # standby/scanning mode
+                # format: 0xaa 0xaa 0x03 0xd4 0x01 0x00 0x2a
+                self.status = MINDWAVE_STATUS_STANDBY
+                vlength = payload[0]
+                value = payload[1]
+                self.package.append(vlength)
+                self.package.append(value)
+                 
+            else:
+                #unknow multibyte
+                pass
+        else: 
+            # single byte there isn't vlength
+            # 0-127
+            byte, payload = ord(payload[0]), payload[1:0]
+
+            if code == POOR_SIGNAL:
+                self.signal = byte
+            elif code == ATTENTION:
+                self.attention = byte
+            elif code == MEDITATION:
+                self.meditation = byte
+            elif code == BLINK:
+                self.blink = byte
+            else: 
+                pass
         
         for b in self.package:
             print '0x%s, ' % b.encode('hex'),
@@ -205,8 +242,7 @@ class Mindwave(object):
                     pass
                 
                 if self.status != MINDWAVE_STATUS_CONNECTED:
-                    #self.disconnect()
-                    
+                    #self.disconnect()                
                     self.connect()
                     time.sleep(1)
 
@@ -215,8 +251,8 @@ class Mindwave(object):
         else:
             print 'no serial open'
 
-usb = Mindwave('/dev/ttyUSB0','7B04')
-#usb = Mindwave('/dev/ttyUSB0')
+usb = Mindwave('/dev/ttyUSB0')
+#usb = Mindwave('/dev/ttyUSB0',, 57600)
 
 time.sleep(2)
 usb.connect()

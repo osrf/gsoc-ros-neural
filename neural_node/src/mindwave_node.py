@@ -26,18 +26,148 @@ MINDWAVE_STATUS_DENIED          = 3
 MINDWAVE_STATUS_STANDBY         = 4
 
 
-class DongleReader(threading.Thread):
-    def __init__(self, parser, *args, **kargs):
+class DongleListener(threading.Thread):
+    def __init__(self, parser, *args, **kwargs):
         self.parser = parser
         self.running = True
-        super(DongleReader, self).__init__(*args, **kwargs)
+        super(DongleListener, self).__init__(*args, **kwargs)
     
     def run(self):
         while True:
-            pass        
+            #time.sleep(0.5)
+            # listeng for incoming bytes             
+            self.parser.listen()
+            time.sleep(1)
+
     def stop(self):
         self.running = False
         self._Thread__stop()
+
+class Parser(object):
+    def __init__(self, headset, stream):
+        self.headset = headset
+        self.stream = stream
+        self.package = []
+
+    def listen(self):
+        #self.disconnect()
+        settings = self.stream.getSettingsDict()   
+
+        for i in xrange(2):
+            settings['rtscts'] = not settings['rtscts']
+            self.stream.applySettingsDict(settings)
+
+        if self.stream.isOpen():
+            #while True:
+                #print ord(self.stream.read())
+                #print "Data packet: [%s, %s] " % (self.to_hex(self.stream.read()), self.to_hex(self.stream.read()))
+                #print "Data packet: [%s, %s] " % (self.to_hex(self.stream.read()), self.stream.read().encode())
+            while True:
+                byte1 = self.stream.read()
+                byte2 = self.stream.read()                      
+                
+                self.package.append(byte1)
+                self.package.append(byte2)
+
+                if byte1 == SYNC and byte2 == SYNC:
+                    #print '0x%s , 0x%s ' % (byte1.encode('hex'), byte2.encode('hex'))
+                
+                    while True:
+                        plength = self.stream.read() # 0-169
+                        self.package.append(plength)
+                        plength = ord(plength)
+                        if plength != 170: 
+                            break
+                    if plength > 169: # return to while
+                        continue        
+                    
+                    payload = self.stream.read(plength)
+                    checksum = 0
+                    checksum = sum(ord(b) for b in payload[:-1])
+                    checksum &= 0xff
+                    checksum = ~checksum & 0xff
+
+                    chksum = ord(self.stream.read())
+
+                    if checksum != chksum:
+                        pass
+
+                    #print 'payload ', payload.encode('hex')
+                    self.parser_payload(payload)
+
+                    for b in self.package:
+                        print '0x%s, ' % b.encode('hex'),
+                    print ""
+        
+                    self.package = []
+                else:
+                    pass        
+        else:
+            print 'no stream open'
+
+    def parser_payload(self, payload):
+
+        while payload:
+            code, payload = payload[0], payload[1:] 
+            self.package.append(code)
+        
+            if code >= 0x80:
+                vlength, payload = payload[0], payload[1:]
+                value, payload = payload[:ord(vlength)], payload[ord(vlength):]
+                
+                self.package.append(vlength)
+                self.package.append(value)
+                        
+                if code == MINDWAVE_CONNECTED:
+                    # headset found
+                    # format: 0xaa 0xaa 0x04 0xd0 0x02 0x05 0x05 0x23
+                    self.headset.status = MINDWAVE_STATUS_CONNECTED
+                    self.headset.id = value 
+                                            
+                elif code == MINDWAVE_NOFOUND:  # it can be 0 or 2 bytes
+                    # headset no found
+                    # format: 0xaa 0xaa 0x04 0xd1 0x02 0x05 0x05 0xf2
+
+                    self.headset.status = MINDWAVE_STATUS_NOFOUND
+                    
+                    # 0xAA 0xAA 0x02 0xD1 0x00 0xD9
+                    
+                elif code == MINDWAVE_DISCONNECTED: # dongle send 4 bytes
+                    # headset found
+                    # format: 0xaa 0xaa 0x04 0xd2 0x02 0x05 0x05 0x21
+                    self.headset.status = MINDWAVE_STATUS_DISCONNECTED
+                
+                elif code == MINDWAVE_REQUESTDENIED:
+                    # headset found
+                    # format: 0xaa 0xaa 0x02 0xd3 0x00 0x2c
+                    self.headset.status = MINDWAVE_STATUS_DENIED
+                
+                elif code == MINDWAVE_STANDBY: # waiting for a command the device send a byte 0x00
+                    # standby/scanning mode
+                    # format: 0xaa 0xaa 0x03 0xd4 0x01 0x00 0x2a
+                    self.headset.status = MINDWAVE_STATUS_STANDBY
+                     
+                else:
+                    #unknow multibyte
+                    pass
+            else: 
+                # single byte there isn't vlength
+                # 0-127
+                value, payload = payload[0], payload[1:]
+                
+                self.package.append(value)
+
+                if code == POOR_SIGNAL:
+                    self.headset.signal = ord(value)
+                elif code == ATTENTION:
+                    self.headset.attention = ord(value)
+                elif code == MEDITATION:
+                    self.headset.meditation = ord(value)
+                elif code == BLINK:
+                    self.headset.blink = ord(value)
+                else: 
+                    pass
+
 
 class Mindwave(object):
 
@@ -57,38 +187,42 @@ class Mindwave(object):
         self.attention = 0 # 0-100
         self.signal = 0
         self.status = None
-        self.serial = None
-        self.package = []
+        self.stream = None
 
         self.open()
-
-    def debug_hex(self, value):
-        print 'printed 0x%s ', value.encode('hex')
-
+        time.sleep(0.5)
+        
+        self.parser = Parser(self, self.stream)
+        self.listener = DongleListener(self.parser)
+        
+        if not self.listener.isAlive():
+            self.listener.daemon = True
+            self.listener.start()
+        
     def open(self):
-        if not self.serial or not self.serial.IsOpen():
-            #self.serial = serial.Serial(self.device, baudrate=115200, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE,
-            #    bytesize=serial.EIGHTBITS, writeTimeout=0, timeout=3, rtscts=True, xonxoff=False)
-            self.serial = serial.Serial(self.device, self.baudrate, timeout=0.001)
+        if not self.stream or not self.stream.IsOpen():
+            #self.stream = stream.stream(self.device, baudrate=115200, parity=stream.PARITY_NONE, stopbits=stream.STOPBITS_ONE,
+            #    bytesize=stream.EIGHTBITS, writeTimeout=0, timeout=3, rtscts=True, xonxoff=False)
+            self.stream = serial.Serial(self.device, self.baudrate, timeout=0.001)
 
     def close(self):
-        self.serial.close()
+        self.stream.close()
 
     def autoconnect(self):
         #self.debug_hex(AUTOCONNECT)
-        self.serial.write(AUTOCONNECT)  
-        #if autoconnect we must wait 10 seconds
+        self.stream.write(AUTOCONNECT)  
+        #the dongle switch to autoconnect mode it must wait 10 second to connect any headset
         time.sleep(10)
 
     def connect(self):
         if self.id is not None:
             # we send a byte to CONNECTED and other byte in hex of headset id
-            self.serial.write(''.join([CONNECTED, self.id.decode('hex')]))
+            self.stream.write(''.join([CONNECTED, self.id.decode('hex')]))
         else:
             self.autoconnect()
 
     def disconnect(self):
-        self.serial.write(DISCONNECTED)
+        self.stream.write(DISCONNECTED)
 
     def to_hex(t, nbytes):
         "Format text t as a sequence of nbyte long values separated by spaces."
@@ -99,161 +233,24 @@ class Mindwave(object):
             for start in xrange(0, len(hex_version), chars_per_item):
                 yield hex_version[start:start + chars_per_item]
         return ' '.join(chunkify())
-    
+        
     def print_connection_data(self):
         logger.info("checking if port is opened:")
-        logger.info(self.serial.isOpen())
+        logger.info(self.stream.isOpen())
         logger.info("checking if we have characters to read:")
-        logger.info(self.serial.inWaiting())
+        logger.info(self.stream.inWaiting())
         logger.info("getting settings dict:")
-        logger.info(self.serial.getSettingsDict())
+        logger.info(self.stream.getSettingsDict())
 
-    def parser_payload(self, payload):
+headset = Mindwave('/dev/ttyUSB0')
+#headset = Mindwave('/dev/ttyUSB0','7B04')
 
-        vlength = 0
-        
-        code = payload[0]
-        payload = payload[1:] 
-        
-        self.package.append(code)
-        if code >= 0x80:
-            if code == MINDWAVE_CONNECTED:
-                # headset found
-                # format: 0xaa 0xaa 0x04 0xd0 0x02 0x05 0x05 0x23
-                self.status = MINDWAVE_STATUS_CONNECTED
-                vlength = payload[0]
-                self.package.append(vlength)
-                self.package.append( payload[1])
-                self.package.append( payload[2])
-                     
-            elif code == MINDWAVE_NOFOUND:  # it can be 0 or 2 bytes
-                # headset no found
-                # format: 0xaa 0xaa 0x04 0xd1 0x02 0x05 0x05 0xf2
+while True:
+    if headset.status == MINDWAVE_STATUS_STANDBY:     
+        print "trying connecting"
+        headset.connect()
+        time.sleep(0.5)
 
-                self.status = MINDWAVE_STATUS_NOFOUND
-                vlength = payload[0]
-                self.package.append(vlength)
-                
-                # 0xAA 0xAA 0x02 0xD1 0x00 0xD9
-                if ord(vlength) == 2:
-                    self.package.append( payload[1])
-                    self.package.append( payload[2])
-                else:
-                    pass
-
-            elif code == MINDWAVE_DISCONNECTED: # dongle send 4 bytes
-                # headset found
-                # format: 0xaa 0xaa 0x04 0xd2 0x02 0x05 0x05 0x21
-                self.status = MINDWAVE_STATUS_DISCONNECTED
-                vlength = payload[0]
-                self.package.append(vlength)
-                self.package.append( payload[1])
-                self.package.append( payload[2])
-
-            elif code == MINDWAVE_REQUESTDENIED:
-                # headset found
-                # format: 0xaa 0xaa 0x02 0xd3 0x00 0x2c
-                self.status = MINDWAVE_STATUS_DENIED
-                vlength = payload[0]
-                self.package.append(vlength)
-
-            elif code == MINDWAVE_STANDBY: # waiting for a command the device send a byte 0x00
-                # standby/scanning mode
-                # format: 0xaa 0xaa 0x03 0xd4 0x01 0x00 0x2a
-                self.status = MINDWAVE_STATUS_STANDBY
-                vlength = payload[0]
-                value = payload[1]
-                self.package.append(vlength)
-                self.package.append(value)
-                 
-            else:
-                #unknow multibyte
-                pass
-        else: 
-            # single byte there isn't vlength
-            # 0-127
-            byte, payload = ord(payload[0]), payload[1:0]
-
-            if code == POOR_SIGNAL:
-                self.signal = byte
-            elif code == ATTENTION:
-                self.attention = byte
-            elif code == MEDITATION:
-                self.meditation = byte
-            elif code == BLINK:
-                self.blink = byte
-            else: 
-                pass
-        
-        for b in self.package:
-            print '0x%s, ' % b.encode('hex'),
-        print ""
-
-        self.package = []    
-
-    def listen(self):
-
-        #self.disconnect()
-        settings = self.serial.getSettingsDict()   
-
-        for i in xrange(2):
-            settings['rtscts'] = not settings['rtscts']
-            self.serial.applySettingsDict(settings)
-
-        if self.serial.isOpen():
-            #while True:
-                #print ord(self.serial.read())
-                #print "Data packet: [%s, %s] " % (self.to_hex(self.serial.read()), self.to_hex(self.serial.read()))
-                #print "Data packet: [%s, %s] " % (self.to_hex(self.serial.read()), self.serial.read().encode())
-            while True:
-                byte1 = self.serial.read()
-                byte2 = self.serial.read()                      
-                
-                self.package.append(byte1)
-                self.package.append(byte2)
-
-                if byte1 == SYNC and byte2 == SYNC:
-                    #print '0x%s , 0x%s ' % (byte1.encode('hex'), byte2.encode('hex'))
-                
-                    while True:
-
-                        plength = self.serial.read() # 0-169
-                        self.package.append(plength)
-                        plength = ord(plength)
-                        if plength != 170: 
-                            break
-                    if plength > 169: # return to while
-                        continue        
-                    
-                    payload = self.serial.read(plength)
-                    checksum = 0
-                    checksum = sum(ord(b) for b in payload[:-1])
-                    checksum &= 0xff
-                    checksum = ~checksum & 0xff
-
-                    chksum = ord(self.serial.read())
-
-                    if checksum != chksum:
-                        pass
-
-                    #print 'payload ', payload.encode('hex')
-                    self.parser_payload(payload)
-                else:
-                    pass
-                
-                if self.status != MINDWAVE_STATUS_CONNECTED:
-                    #self.disconnect()                
-                    self.connect()
-                    time.sleep(1)
-
-                if self.status == MINDWAVE_STATUS_CONNECTED:
-                    print "quality signal: %s , attention %s , %meditation " % (self.signal, self.attention, self.meditation)
-        else:
-            print 'no serial open'
-
-usb = Mindwave('/dev/ttyUSB0')
-#usb = Mindwave('/dev/ttyUSB0',, 57600)
-
-time.sleep(2)
-usb.connect()
-usb.listen() # listen for incomming bytes
+    elif headset.status == MINDWAVE_STATUS_CONNECTED:
+        print "quality signal: %s , attention %s , %s meditation " % (headset.signal, headset.attention, headset.meditation)
+    

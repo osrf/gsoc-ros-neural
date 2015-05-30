@@ -96,7 +96,8 @@ class Parser(object):
                     self.parser_payload(payload)
 
                     for b in self.package:
-                        print '0x%s, ' % b.encode('hex'),
+                        if not b == "":
+                            print '0x%s, ' % b.encode('hex'),
                     print ""
         
                     self.package = []

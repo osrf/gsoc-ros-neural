@@ -1,0 +1,10 @@
+<launch>
+  	<node name="mindwave_node" pkg="neural_package" type="mindwave_node.py" 
+       output="screen" respawn="true">
+	  <!--<remap from="points" to="/surface" /> -->
+	  
+	  <!-- range values for variables -->
+	  <param name="addr" value="00.00.00.00" />
+	  <param name="dev" value="/tty/ttyUSB0" />
+	</node>
+</launch>

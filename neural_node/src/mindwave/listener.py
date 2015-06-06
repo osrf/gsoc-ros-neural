@@ -9,11 +9,13 @@ class DongleListener(threading.Thread):
     def run(self):
         while True:
             # listeng for incoming bytes 
-            print 'listener 0'            
-            self.parser.listen()
-            time.sleep(0.5)
+         
+            self.parser.listen2()
+            time.sleep(0.1)
             print 'listener 1'
 
     def stop(self):
         self.running = False
         self._Thread__stop()
+
+    #   *689400 jorge orreaga pacho

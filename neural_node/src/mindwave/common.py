@@ -1,7 +1,7 @@
 from enum import Enum
 
 # protocol 
-class Bytes(Enum):
+class Bytes:
     SYNC            = '\xaa'
     POOR_SIGNAL     = '\x02'
     ATTENTION       = '\x04'
@@ -26,7 +26,7 @@ class Status:
     DENIED          = "denied"
     STANDBY         = "scanning"
 
-class Version(Enum):
+class Version:
     MINDWAVE = "MindWave"
     MINDWAVE_MOBILE = "MindWave Mobile"
 

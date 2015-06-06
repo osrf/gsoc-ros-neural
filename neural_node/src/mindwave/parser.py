@@ -1,10 +1,13 @@
 
 class Parser(object):
     def __init__(self, headset, stream):
-        print stream
+        print headset
         self.headset = headset
         self.stream = stream
         self.buffer = []
+
+    def listen2(self):
+        print "do work"
 
     def listen(self):
         # settings = self.stream.getSettingsDict()   
@@ -18,10 +21,11 @@ class Parser(object):
         print "inside listen"
         byte1 = self.stream.read(1)
         byte2 = self.stream.read(1)                      
-        
+        print byte1
+
         self.buffer.append(byte1)
         self.buffer.append(byte2)
-        print "inside listen2"
+        
         print BytesStatus.CONNECT
 
         if byte1 == Bytes.SYNC and byte2 == Bytes.SYNC:

@@ -20,9 +20,10 @@ class Headset:
 
     def run(self, stream):  # Stream class
         self.stream = stream
-        #if self.stream is not None:
-        self.parser = Parser(self, self.stream)
-        self.listener = DongleListener(self.parser)
+
+        if self.stream is not None:
+            self.parser = Parser(self, self.stream)
+            self.listener = DongleListener(self.parser)
 
         if not self.listener.isAlive():
             self.listener.daemon = True

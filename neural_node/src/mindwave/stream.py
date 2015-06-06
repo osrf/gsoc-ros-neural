@@ -17,24 +17,23 @@ class Stream(object):
 
     def read(self, bytes=1):
         missing = bytes
-        received = ""
-        print "bytes ",  bytes
-        print "version ", self.version
-        while missing > 0:
-            print "inside loop"
-            if self.version == Version.MINDWAVE_MOBILE:
-                print "before"
-                received = received + self.stream.recv(missing)
-                print len(received)
-                print "after"
-                missing = bytes - len(received)
-            elif self.version == Version.MINDWAVE:
-                received +=  self.stream.read(missing)
-                missing = bytes - len(received)
+        data = ""
 
-        print "reading ", received
-        return received
-
+        # while missing > 0:
+        #     if self.version == Version.MINDWAVE_MOBILE:
+        #         data = data + self.stream.recv(missing)
+        #         missing = bytes - len(data)
+        #     elif self.version == Version.MINDWAVE:
+        #         data +=  self.stream.read(missing)
+        #         missing = bytes - len(data)
+        # return data
+        
+        if self.version == Version.MINDWAVE_MOBILE:
+            data = self.stream.recv(bytes)
+        elif self.version == Version.MINDWAVE:
+            data = self.stream.read(bytes)
+        return data
+        
     def close(self):
         self.stream.close()    
 

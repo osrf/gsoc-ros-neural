@@ -7,7 +7,10 @@ class Bytes:
     ATTENTION       = '\x04'
     MEDITATION      = '\x05'
     BLINK           = '\x16'
-
+    #multibytes
+    RAW_VALUE       = '\x80'
+    ASIC_EEG_POWER  = '\x83'
+    
 class BytesStatus:
     RESPONSE_CONNECTED      = '\xd0'
     RESPONSE_NOFOUND        = '\xd1'

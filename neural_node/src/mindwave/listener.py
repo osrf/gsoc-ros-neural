@@ -9,13 +9,36 @@ class DongleListener(threading.Thread):
     def run(self):
         while True:
             # listeng for incoming bytes 
-         
-            self.parser.listen2()
-            time.sleep(0.1)
-            print 'listener 1'
+            bytes = self.parser.stream.read(1000)
+            #self.parser.print_bytes(bytes)
+            self.parser.parser(bytes)
+            time.sleep(0.25)
 
     def stop(self):
         self.running = False
         self._Thread__stop()
 
-    #   *689400 jorge orreaga pacho
+
+class Listener(object):
+ 
+    def __init__(self, parser, interval=1, ):
+        self.interval = interval
+        self.parser = parser
+        self.running = True
+
+        thread = threading.Thread(target=self.run, args=())
+        thread.daemon = True # Daemonize thread
+        thread.start()       # Start the execution
+ 
+    def run(self):
+        """ Method that runs forever """
+        while True:
+            # Do something
+            self.parser.listen2() 
+            time.sleep(self.interval)
+
+    def stop(self):
+        self.running = False
+        self._Thread__stop()
+
+        #   *689400 jorge orreaga pacho

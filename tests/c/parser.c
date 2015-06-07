@@ -58,8 +58,10 @@ int main( int argc, char **argv ) {
      * platform for details.
      */
     FILE *stream = 0;
-    stream = fopen( "/dev/ttyUSB0", "r+" );
- 
+    stream = fopen( "\\\\.\\COM22", "r+" );
+    
+    if (stream<0) perror("open COM:");
+
     /* Loop forever, parsing one Packet per loop... */
     while( 1 ) {
  

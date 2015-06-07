@@ -18,6 +18,9 @@ class Headset:
         self.signal = 0
         self.status = None
 
+        self.raw_value = 0
+        self.asig_eeg_power = []
+        
     def run(self, stream):  # Stream class
         self.stream = stream
 

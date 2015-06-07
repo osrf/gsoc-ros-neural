@@ -1,13 +1,79 @@
 
+
+def bigend_24b(b1, b2, b3):
+    return b1* 255 * 255 + 255 * b2 + b3
+
 class Parser(object):
     def __init__(self, headset, stream):
-        print headset
         self.headset = headset
         self.stream = stream
         self.buffer = []
+    
+    def __call__(self):
+        return self
 
-    def listen2(self):
-        print "do work"
+    def print_bytes(self, data):
+       for b in data:
+            print '0x%s, ' % b.encode('hex'),
+
+    def parser(self, data):
+        # settings = self.stream.getSettingsDict()   
+
+        # for i in xrange(2):
+        #     settings['rtscts'] = not settings['rtscts']
+        #     self.stream.applySettingsDict(settings)
+
+        while len(data)> 1 :
+            try:
+                byte1, byte2 = data[0],  data[1]
+
+                # SYNC | SYNC | PLENGTH | PAYLOAD | CHKSUM
+                # PAYLOAD: (EXCODE) | CODE |(VLENGTH) | VALUE
+                if byte1 == Bytes.SYNC and byte2 == Bytes.SYNC:
+
+                    self.buffer.append(byte1)
+                    self.buffer.append(byte2)
+                    data = data[2:]
+                    while True:
+                        plength = data[0] # 0-169
+                        self.buffer.append(plength)
+                        plength = ord(plength)
+                        if plength != 170:
+                            break
+                    if plength > 170:
+                        pass #continue
+
+                    data = data[1:]
+
+                    payload = data[:plength]
+                    checksum = 0
+                    checksum = sum(ord(b) for b in payload[:-1])
+                    checksum &= 0xff
+                    checksum = ~checksum & 0xff
+
+                    chksum = data[plength]
+
+                    if checksum != ord(chksum):
+                        pass
+
+                    self.parser_payload(payload)
+                    self.buffer.append(chksum)
+
+                    data = data[plength+1:]
+
+                    # for b in self.buffer:
+                    #     if not b == "":
+                    #         print '0x%s, ' % b.encode('hex'),
+                    # print ""
+
+                    self.buffer = []
+                else:
+                   data = data[1:]
+
+            except IndexError:
+                pass
+
+
 
     def listen(self):
         # settings = self.stream.getSettingsDict()   
@@ -18,19 +84,15 @@ class Parser(object):
 
         #if self.stream.isOpen():
            #while True:
-        print "inside listen"
         byte1 = self.stream.read(1)
         byte2 = self.stream.read(1)                      
-        print byte1
 
         self.buffer.append(byte1)
         self.buffer.append(byte2)
         
-        print BytesStatus.CONNECT
-
+        # SYNC | SYNC | PLENGTH | (EXCODE) | CODE |(VLENGTH) | VALUE
         if byte1 == Bytes.SYNC and byte2 == Bytes.SYNC:
-            print '0x%s , 0x%s ' % (byte1.encode('hex'), byte2.encode('hex'))
-        
+         
             while True:
                 plength = self.stream.read() # 0-169
                 self.buffer.append(plength)
@@ -46,18 +108,19 @@ class Parser(object):
             checksum &= 0xff
             checksum = ~checksum & 0xff
 
-            chksum = ord(self.stream.read())
+            chksum = self.stream.read()
 
-            if checksum != chksum:
+            if checksum != ord(chksum):
                 pass
 
             #print 'payload ', payload.encode('hex')
             self.parser_payload(payload)
+            self.buffer.append(chksum)
 
-            for b in self.buffer:
-                if not b == "":
-                    print '0x%s, ' % b.encode('hex'),
-            print ""
+            # for b in self.buffer:
+            #     if not b == "":
+            #         print '0x%s, ' % b.encode('hex'),
+            # print ""
 
             self.buffer = []
         else:
@@ -68,17 +131,24 @@ class Parser(object):
     def parser_payload(self, payload):
 
         while payload:
-            code, payload = payload[0], payload[1:] 
             
-        
-            if code >= 0x80:
-                vlength, payload = payload[0], payload[1:]
-                value, payload = payload[:ord(vlength)], payload[ord(vlength):]
+            try:
+                code, payload = payload[0], payload[1:] 
+            except IndexError:
+                pass    
+            
+            self.buffer.append(code)
+            # multibytes
+            if ord(code) >= 0x80:
                 
-                self.buffer.append(code)
+                try:
+                    vlength, payload = payload[0], payload[1:]
+                    value, payload = payload[:ord(vlength)], payload[ord(vlength):]                  
+                except IndexError:
+                    pass    
+            
                 self.buffer.append(vlength)
-                self.buffer.append(value)
-                        
+                      
                 if code == BytesStatus.RESPONSE_CONNECTED:
                     # headset found
                     # format: 0xaa 0xaa 0x04 0xd0 0x02 0x05 0x05 0x23
@@ -108,14 +178,27 @@ class Parser(object):
                     # format: 0xaa 0xaa 0x03 0xd4 0x01 0x00 0x2a
                     self.headset.status = Status.STANDBY
                      
-                else:
-                    #unknow multibyte
+                elif code == Bytes.RAW_VALUE:
+                    hight = value[0] 
+                    low = value[1]
+                    self.buffer.append(hight)
+                    self.buffer.append(low)
+                    self.headset.raw_value = ord(hight)*255+ord(low)
+ 
+                elif code == Bytes.ASIC_EEG_POWER:
+                    # ASIC_EEG_POWER_INT
+                    # delta, theta, low-alpha, high-alpha, low-beta, high-beta,
+                    # low-gamma, high-gamma
+
+                    self.headset.asig_eeg_power = []
+                    for i in range(8):
+                        self.headset.asig_eeg_power.append(bigend_24b(value[0], value[1], value[2]))
+                else: #unknow multibyte
                     pass
-            else: 
+            else:   
                 # single byte there isn't vlength
                 # 0-127
                 value, payload = payload[0], payload[1:]
-                
                 self.buffer.append(value)
 
                 if code == Bytes.POOR_SIGNAL:

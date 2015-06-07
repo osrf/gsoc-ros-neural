@@ -6,7 +6,7 @@ import time
 from headset import Headset
 from stream import Stream
 from parser import Parser
-from listener import DongleListener
+from listener import Listener
 from common import *
 
 DEFAULT_BYTES = 1000
@@ -33,15 +33,7 @@ class BluetoothHeadset(Headset):
 
         self.connect(self.addr)
             
-        #self.run(self.stream)
-
-        self.parser = Parser(self, self.stream)
-        # self.listener = DongleListener(self.parser)
-            
-        # if not self.listener.isAlive():
-        #     print 'daemon'
-        #     self.listener.daemon = True
-        #     self.listener.start()   
+        self.run(self.stream)
 
     def connect(self, addr):
       
@@ -83,9 +75,11 @@ class BluetoothHeadset(Headset):
         
             for b in data:
                 print '0x%s, ' % b.encode('hex'),
+            print ""
 
-    def parser(self):
+    def read(self): # read without daemon thread 
         while True:
-            self.parser.listen()
-            time.sleep(0.1)
+            data = self.stream.getStream().recv(DEFAULT_BYTES)
+            self.parser.parser(data)
+            time.sleep(0.5)
             

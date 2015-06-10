@@ -173,9 +173,10 @@ class Parser(object):
                     # format: 0xaa 0xaa 0x02 0xd3 0x00 0x2c
                     self.headset.status = Status.DENIED
                 
-                elif code == BytesStatus.RESPONSE_STANDBY: # waiting for a command the device send a byte 0x00
+                elif code == 0xd4: # waiting for a command the device send a byte 0x00
                     # standby/scanning mode
                     # format: 0xaa 0xaa 0x03 0xd4 0x01 0x00 0x2a
+                    print 'scanning'
                     self.headset.status = Status.STANDBY
                      
                 elif code == Bytes.RAW_VALUE:

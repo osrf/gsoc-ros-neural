@@ -8,13 +8,13 @@ from common import Version, BytesStatus
 class WirelessHeadset(Headset):
 
     def __init__(self, dev="/dev/ttyUSB0", headset_id=None):
-        
+
         Headset.__init__(self, headset_id, version=Version.MINDWAVE)
 
         self.device = dev
         
         self.stream = Stream(device=dev, version=Version.MINDWAVE)
-        time.sleep(1)
+        time.sleep(2)
 
         self.connect()
         self.run(self.stream)
@@ -48,3 +48,12 @@ class WirelessHeadset(Headset):
         logger.info(self.stream.inWaiting())
         logger.info("getting settings dict:")
         logger.info(self.stream.getSettingsDict())
+    
+    def echo_raw(self):
+        while 1:
+            #time.sleep()
+            data = self.stream.read(1)
+    
+            for b in data:
+                print '0x%s, ' % b.encode('hex'),
+            print ""

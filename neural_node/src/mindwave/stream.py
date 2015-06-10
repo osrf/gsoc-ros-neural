@@ -10,11 +10,16 @@ class Stream(object):
         
         self.stream = None
         self.version = version
-        if version == Version.MINDWAVE_MOBILE:
-            self.stream =  bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-        elif version == Version.MINDWAVE:
-            self.stream = serial.Serial(device, baudrate, timeout=0.001, rtscts=True)
-
+        try:
+            if version == Version.MINDWAVE_MOBILE:
+                self.stream =  bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+            elif version == Version.MINDWAVE:
+                if not self.stream or not self.stream.isOpen():
+                    self.stream = serial.Serial(device, baudrate, timeout=0.001, rtscts=True)
+        except Exception, e:
+            print "error open port: " + str(e)
+            exit()
+        
     def read(self, bytes=1):
         missing = bytes
         data = ""
@@ -27,13 +32,13 @@ class Stream(object):
         #         data +=  self.stream.read(missing)
         #         missing = bytes - len(data)
         # return data
-        
+
         if self.version == Version.MINDWAVE_MOBILE:
             data = self.stream.recv(bytes)
         elif self.version == Version.MINDWAVE:
             data = self.stream.read(bytes)
         return data
-        
+
     def close(self):
         self.stream.close()    
 
@@ -42,7 +47,7 @@ class Stream(object):
     
     def isOpen(self):
 
-        if version == Version.MINDWAVE_MOBILE:
+        if self.version == Version.MINDWAVE_MOBILE:
             return True
-        elif version == Version.MINDWAVE:
+        elif self.version == Version.MINDWAVE:
             self.stream.isOpen()

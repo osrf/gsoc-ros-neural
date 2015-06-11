@@ -17,15 +17,17 @@ The main goal of this project is create a ros package, driver plugin library and
 #### Dependencies ####
 In order to be able to run the nodes, it is necessary, at first, clone or install some packages:
 
-* no yet
+* pyserial
+* pip install pybluez
+* If you use python 2.7 install : pip install enum34
 
 #### Summary of set up ####
 
 
 ### What contain folders? ###
 
-* **src folder:** Nodes and class
-* **launch folder:** launch files for training and testing
+* **mindwave_driver: driver of mindwave and files of the node
+* **launch folder:** launch files to start listening of device
 * **msg folder:** ros message to nodes
 
 ### Contacts ###

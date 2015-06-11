@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package>
+  <name>mindwave_driver</name>
+  <version>0.0.1</version>
+  <description>
+    This package provides a driver to Mindwave device from
+    NeuroSky, it was tested with Mindwave Mobile version with
+    Bluetooth
+  </description>
+  <author> Steve Ataucuri </author>
+  <maintainer email="lord.ataucuri@ucsp.edu.pe">Steve</maintainer>
+  <license>BSD</license>
+
+  <build_depend>catkin</build_depend>
+
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>rospy</run_depend>
+  <run_depend>diagnostic_msgs</run_depend>
+</package>

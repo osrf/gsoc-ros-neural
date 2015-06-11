@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import time
 from mindwave.bluetooth_headset import BluetoothHeadset
 from mindwave.common import *

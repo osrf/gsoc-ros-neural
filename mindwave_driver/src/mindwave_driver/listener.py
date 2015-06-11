@@ -1,5 +1,6 @@
 import threading, time
- 
+from common import DEFAULT_BYTES
+
 class DongleListener(threading.Thread):
     def __init__(self, parser, *args, **kwargs):
         self.parser = parser
@@ -9,10 +10,10 @@ class DongleListener(threading.Thread):
     def run(self):
         while True:
             # listeng for incoming bytes 
-            bytes = self.parser.stream.read(1)
+            bytes = self.parser.stream.read(DEFAULT_BYTES)
             #self.parser.print_bytes(bytes)
             self.parser.parser(bytes)
-            #time.sleep(0.25)
+            time.sleep(0.25)
 
     def stop(self):
         self.running = False

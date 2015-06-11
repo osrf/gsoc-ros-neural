@@ -9,7 +9,7 @@ from parser import Parser
 from listener import Listener
 from common import *
 
-DEFAULT_BYTES = 1000
+
 class BluetoothHeadset(Headset):
     def __init__(self, addr=None):
         self.addr = addr

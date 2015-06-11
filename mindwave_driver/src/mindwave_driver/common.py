@@ -33,3 +33,4 @@ class Version:
     MINDWAVE = "MindWave"
     MINDWAVE_MOBILE = "MindWave Mobile"
 
+DEFAULT_BYTES = 1000

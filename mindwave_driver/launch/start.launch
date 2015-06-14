@@ -1,7 +1,0 @@
-<launch>
-  	<node name="mindwave" pkg="mindwave_driver" type="mindwave_node.py" 
-       output="screen" respawn="true">
-	  <param name="addr" value="00.00.00.00" />
-	  <param name="dev" value="/tty/ttyUSB0" />
-	</node>
-</launch>

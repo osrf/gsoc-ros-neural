@@ -38,8 +38,5 @@ class Listener(object):
             self.parser.listen2() 
             time.sleep(self.interval)
 
-    def stop(self):
-        self.running = False
-        self._Thread__stop()
 
         #   *689400 jorge orreaga pacho

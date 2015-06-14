@@ -16,7 +16,7 @@ class BluetoothHeadset(Headset):
         self.isConnected = False
         self.name = ""
         
-        Headset.__init__(self, version=Version.MINDWAVE_MOBILE)
+        Headset.__init__(self)
         
         if addr is None:
             self.addr = self.find()
@@ -25,9 +25,7 @@ class BluetoothHeadset(Headset):
             self.status = Status.NOFOUND
             print "No Mindwave Mobile found"
             sys.exit(-1)
-        else:
-            print self.name + " " + self.addr
-
+        
         self.stream = Stream(version=Version.MINDWAVE_MOBILE)
         time.sleep(1)
 

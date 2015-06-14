@@ -3,7 +3,7 @@ from listener import DongleListener
 
 class Headset:
 
-    def __init__(self, headset_id=None, version=None):
+    def __init__(self, headset_id=None):
         
         if headset_id:
             self.id = headset_id
@@ -31,8 +31,4 @@ class Headset:
         if not self.listener.isAlive():
             self.listener.daemon = True
             self.listener.start()
-
-    def connect(self):
-        pass
-    def disconnect(self):
-        pass
+            

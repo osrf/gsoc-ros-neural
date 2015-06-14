@@ -16,8 +16,8 @@ The main goal of this project is create a ros package, driver plugin library and
 
 #### Dependencies ####
 In order to be able to run the nodes, it is necessary, at first, clone or install some packages:
-
-* pyserial
+* apt-get install libbluetooth-dev
+* pip install pyserial
 * pip install pybluez
 * If you use python 2.7 install : pip install enum34
 

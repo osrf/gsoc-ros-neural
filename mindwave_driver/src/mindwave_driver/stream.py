@@ -1,6 +1,6 @@
 import bluetooth 
 from bluetooth.btcommon import BluetoothError
-import serial, time
+import serial
 
 from common import Version
 
@@ -21,7 +21,7 @@ class Stream(object):
             exit()
         
     def read(self, bytes=1):
-        missing = bytes
+        #missing = bytes
         data = ""
 
         # while missing > 0:

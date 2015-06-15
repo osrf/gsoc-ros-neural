@@ -34,7 +34,8 @@ class BluetoothHeadset(Headset):
         self.run(self.stream)
 
     def connect(self, addr):
-      
+        
+        tried = 0
         while not self.isConnected:
             try:
                 if not self.stream is None:
@@ -42,9 +43,18 @@ class BluetoothHeadset(Headset):
                     self.stream.getStream().setblocking(False)
                     self.isConnected = True
                     self.status = Status.CONNECTED
+
             except BluetoothError, e:
                 self.status = Status.DISCONNECTED
                 print "Connection error: ", e, "Retriyin in 5 secs.."
+                
+                # we try to open again
+                if tried == 5:
+                    self.stream.open()
+                    trie = 0
+                
+                tried = tried + 1
+                
                 time.sleep(5)
 
     def find(self):
@@ -62,7 +72,7 @@ class BluetoothHeadset(Headset):
         return None
 
     def echo_raw(self):
-        while 1:
+        while True:
             time.sleep(0.1)
             try:
                 data = self.stream.getStream().recv(DEFAULT_BYTES)
@@ -76,8 +86,19 @@ class BluetoothHeadset(Headset):
             print ""
 
     def read(self): # read without daemon thread 
+        self.tmp_parser = Parser(self, self.stream.getStream())
+
         while True:
-            data = self.stream.getStream().recv(DEFAULT_BYTES)
-            self.parser.parser(data)
-            time.sleep(0.5)
+            try:
+                data = self.stream.getStream().recv(DEFAULT_BYTES)
+                self.tmp_parser.parser(data)
+                time.sleep(0.5)
+            except BluetoothError, e:
+                print e
+                time.sleep(0.5)
+                continue
+            for b in data:
+                print '0x%s, ' % b.encode('hex'),
+            print ""
+
             

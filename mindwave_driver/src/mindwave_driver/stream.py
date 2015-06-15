@@ -1,3 +1,4 @@
+import time
 import bluetooth 
 from bluetooth.btcommon import BluetoothError
 import serial
@@ -10,10 +11,14 @@ class Stream(object):
         
         self.stream = None
         self.version = version
+        
+        self.open()
+
+    def open(self):
         try:
-            if version == Version.MINDWAVE_MOBILE:
+            if self.version == Version.MINDWAVE_MOBILE:
                 self.stream =  bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-            elif version == Version.MINDWAVE:
+            elif self.version == Version.MINDWAVE:
                 if not self.stream or not self.stream.isOpen():
                     self.stream = serial.Serial(device, baudrate, timeout=0.001, rtscts=True)
         except Exception, e:
@@ -32,12 +37,17 @@ class Stream(object):
         #         data +=  self.stream.read(missing)
         #         missing = bytes - len(data)
         # return data
-
-        if self.version == Version.MINDWAVE_MOBILE:
-            data = self.stream.recv(bytes)
-        elif self.version == Version.MINDWAVE:
-            data = self.stream.read(bytes)
-        return data
+        try:
+            if self.version == Version.MINDWAVE_MOBILE:
+                data = self.stream.recv(bytes)
+            elif self.version == Version.MINDWAVE:
+                data = self.stream.read(bytes)
+            return data
+        except BluetoothError, e:
+            print "Caught BluetoothError: ", e
+            time.sleep(3)
+            #self.open()
+            pass
 
     def close(self):
         self.stream.close()    

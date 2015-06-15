@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
+import rospy
 import time
-from mindwave.bluetooth_headset import BluetoothHeadset
-from mindwave.common import *
+from mindwave_driver.bluetooth_headset import BluetoothHeadset
+from mindwave_driver.common import *
 
 # 20:68:9D:70:CA:96
 headset = BluetoothHeadset("20:68:9D:70:CA:96")

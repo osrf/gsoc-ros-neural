@@ -31,4 +31,7 @@ class Headset:
         if not self.listener.isAlive():
             self.listener.daemon = True
             self.listener.start()
+
+    def close(self):
+        self.stream.close()
             

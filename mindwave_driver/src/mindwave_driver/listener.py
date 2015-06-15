@@ -12,7 +12,8 @@ class DongleListener(threading.Thread):
             # listeng for incoming bytes 
             bytes = self.parser.stream.read(DEFAULT_BYTES)
             #self.parser.print_bytes(bytes)
-            self.parser.parser(bytes)
+            if bytes is not None:
+                self.parser.parser(bytes)
             time.sleep(0.25)
 
     def stop(self):

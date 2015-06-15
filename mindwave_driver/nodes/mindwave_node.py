@@ -14,51 +14,50 @@ from mindwave_msgs.msg import Mindwave
 
 class MindwaveNode:
     def __init__(self):
+        
         rospy.init_node('mindwave_node', anonymous=True)
         self.addr = rospy.get_param("~addr")
         print "Initializing node with addr ... ", self.addr
+
         #self.dev = rospy.get_param("~dev")
         #self.bauderate = rospy.get_param("~bauderate")
 
         if self.addr is not None:
-            headset = BluetoothHeadset(self.addr)
-
-        pub = rospy.Publisher('mindwave', MindwaveValues)
+            self.headset = BluetoothHeadset(self.addr)
+            
+        self.pub = rospy.Publisher('mindwave', Mindwave)
         
-        rate = rospy.Rate(10)
+        self.loop_rate = rospy.Rate(2) #hz  T = 1/f
 
 
     def update(self):
-        msg = MindwaveValues()
-            
+               
         while not rospy.is_shutdown():
-            if headset.status != Status.CONNECTED:
-                print 'trying connecting'
-                headset.connect(headset.addr)
-                time.sleep(1)
-            elif headset.status == Status.CONNECTED:
-                print "quality signal: %s , attention %s , meditation %s , raw %s " % (headset.signal, headset.attention, \
-                       headset.meditation, headset.raw_value)
-                    # delta, theta, low-alpha, high-alpha, low-beta, high-beta,
-                    # # low-gamma, high-gamma
-                    # for e in headset.asig_eeg_power:
-                    #   print ord(e),
-                    # print ""
+            msg = Mindwave()
+            
+            if self.headset.status != Status.CONNECTED:
+                rospy.loginfo('trying connecting')
+                self.headset.connect(headset.addr)
+                rospy.sleep(1)             
             else:
                 pass
-
-            msg.status = status
-            msg.attention = headset.attention
-            msg.meditation = headset.meditation
-            msg.signal = headset.signal
-
-            rospy.loginfo(msg)
-            pub.publish(msg)
-            rate.sleep()
+            
+            msg.status = self.headset.status
+            msg.signal = self.headset.signal
+            msg.attention = self.headset.attention
+            msg.meditation = self.headset.meditation
+      
+            #rospy.loginfo(msg)
+            self.pub.publish(msg)
+            self.loop_rate.sleep()
+            #rospy.spin()
+                
+        self.headset.close()
 
 if __name__ == '__main__':
     try:
-        node = MindwaveNode()       
-        rospy.spin()
+        node = MindwaveNode()
+        node.update()       
+        
     except rospy.ROSInterruptException:
         pass

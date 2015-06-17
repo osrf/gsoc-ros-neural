@@ -58,6 +58,6 @@ if __name__ == '__main__':
     try:
         node = MindwaveNode()
         node.update()       
-        
+        rospy.spin()
     except rospy.ROSInterruptException:
         pass

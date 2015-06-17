@@ -1,0 +1,50 @@
+#!/usr/bin/env python
+
+import rospy
+import roslib
+
+roslib.load_manifest('mindwave_teleop')
+
+from geometry_msgs.msg import Twist
+from mindwave_msgs.msg import Mindwave
+
+
+class Turtlebot:
+    def __init__(self):
+
+        rospy.init_node('turtle_teleop_mindwave', anonymous=True)
+        
+        self.speed = .2
+        self.turn = 1
+        self.loop_rate = rospy.Rate(10) # T = 1/10
+        
+        self.lastvel = Twist()        
+        self.pub = rospy.Publisher('~cmd_vel', Twist, queue_size=5)
+        self.sub = rospy.Subscriber('/mindwave', Mindwave, self.mindwaveCallback)
+
+    def mindwaveCallback(self, msg):
+    
+        twist = Twist()
+        rospy.loginfo(msg)
+        twist.linear.x = 1.0/msg.attention
+        twist.linear.y = 0 
+        twist.linear.z = 0
+        
+        twist.angular.x = 0
+        twist.angular.y = 0
+        twist.angular.z = 1.0/msg.meditation
+        
+        self.lastvel = twist
+
+    def run(self):
+        while not rospy.is_shutdown():
+            self.pub.publish(self.lastvel)
+            self.loop_rate.sleep()
+
+if __name__=="__main__":
+    try:
+        turtle = Turtlebot()
+        turtle.run()
+        rospy.spin()
+    except rospy.ROSInterruptException:
+        pass

@@ -1,0 +1,7 @@
+<launch>
+  <node pkg="mindwave_teleop" type="turtlebot_teleop_mindwave" name="turtle_teleop_mindwave"  output="screen">
+    <param name="scale_linear" value="0.5" type="double"/>
+    <param name="scale_angular" value="1.5" type="double"/>
+    <remap from="turtle_teleop_mindwave/cmd_vel" to="cmd_vel_mux/input/teleop"/>
+  </node>
+</launch>

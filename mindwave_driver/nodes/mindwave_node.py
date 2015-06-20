@@ -50,6 +50,7 @@ class MindwaveNode:
             #rospy.loginfo(msg)
             self.pub.publish(msg)
             self.loop_rate.sleep()
+            #rospy.sleep(0.5)
             #rospy.spin()
                 
         self.headset.close()
@@ -58,6 +59,6 @@ if __name__ == '__main__':
     try:
         node = MindwaveNode()
         node.update()       
-        rospy.spin()
+        #rospy.spin()
     except rospy.ROSInterruptException:
         pass

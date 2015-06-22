@@ -25,7 +25,7 @@ class MindwaveNode:
         if self.addr is not None:
             self.headset = BluetoothHeadset(self.addr)
             
-        self.pub = rospy.Publisher('mindwave', Mindwave)
+        self.pub = rospy.Publisher('mindwave', Mindwave, queue_size=10)
         
         self.loop_rate = rospy.Rate(2) #hz  T = 1/f
 

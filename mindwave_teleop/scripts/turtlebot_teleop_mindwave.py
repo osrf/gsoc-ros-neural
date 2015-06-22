@@ -17,8 +17,8 @@ class Turtlebot:
         
         self.speed = 0.1 # 0.1 m/s
         self.turn = 1
-        self.meditation_threshold = 75
-        self.attention_threshold = 35
+        self.meditation_threshold = 60
+        self.attention_threshold = 25
 
         self.loop_rate = rospy.Rate(10) # T = 1/10
         

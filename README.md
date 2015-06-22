@@ -26,9 +26,9 @@ In order to be able to run the nodes, it is necessary, at first, clone or instal
 
 ### What contain folders? ###
 
-* **mindwave_driver: driver of mindwave and files of the node
-* **launch folder:** launch files to start listening of device
-* **msg folder:** ros message to nodes
+* **mindwave_driver:** driver of Mindwave and files of the node
+* **mindwave_teleop:** package to start teleop the turtlebot robot into Gazebo
+* **mindwave_msgs:** a share ros message to nodes
 
 ### Contacts ###
 

@@ -32,6 +32,7 @@ class BluetoothHeadset(Headset):
         self.connect(self.addr)
             
         self.run(self.stream)
+        #self.read() if I use ros I can't use this because we need a thread
 
     def connect(self, addr):
         
@@ -91,14 +92,15 @@ class BluetoothHeadset(Headset):
         while True:
             try:
                 data = self.stream.getStream().recv(DEFAULT_BYTES)
-                self.tmp_parser.parser(data)
+                if data is not None:
+                    self.tmp_parser.parser(data)
                 time.sleep(0.5)
             except BluetoothError, e:
                 print e
                 time.sleep(0.5)
                 continue
-            for b in data:
-                print '0x%s, ' % b.encode('hex'),
-            print ""
+#            for b in data:
+#                print '0x%s, ' % b.encode('hex'),
+#            print ""
 
             

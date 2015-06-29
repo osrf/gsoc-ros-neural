@@ -15,26 +15,28 @@ from mindwave_msgs.msg import Mindwave
 class MindwaveNode:
     def __init__(self):
         
-        rospy.init_node('mindwave_node', anonymous=True)
-        self.addr = rospy.get_param("~addr")
-        print "Initializing node with addr ... ", self.addr
-
-        #self.dev = rospy.get_param("~dev")
-        #self.bauderate = rospy.get_param("~bauderate")
-
+        rospy.init_node('mindwave_node', anonymous=True)     
+        
+        self.addr = rospy.get_param("~addr", None)
+        
         if self.addr is not None:
             self.headset = BluetoothHeadset(self.addr)
-            
+        else:
+            self.headset = BluetoothHeadset()
+            self.addr = self.headset.addr
+
+        print "Initializing node with addr ... ", self.addr
+
         self.pub = rospy.Publisher('mindwave', Mindwave, queue_size=10)
         
-        self.loop_rate = rospy.Rate(2) #hz  T = 1/f
+        self.loop_rate = rospy.Rate(10)
 
+        print "Publishing ... "
 
     def update(self):
-               
+        msg = Mindwave()
         while not rospy.is_shutdown():
-            msg = Mindwave()
-            
+           
             if self.headset.status != Status.CONNECTED:
                 rospy.loginfo('trying connecting')
                 self.headset.connect(headset.addr)
@@ -51,14 +53,14 @@ class MindwaveNode:
             self.pub.publish(msg)
             self.loop_rate.sleep()
             #rospy.sleep(0.5)
-            #rospy.spin()
-                
+
         self.headset.close()
 
 if __name__ == '__main__':
     try:
         node = MindwaveNode()
-        node.update()       
-        #rospy.spin()
-    except rospy.ROSInterruptException:
+        node.update() 
+        rospy.spin()
+    except rospy.ROSInterruptException, e:
+        print str(e)
         pass

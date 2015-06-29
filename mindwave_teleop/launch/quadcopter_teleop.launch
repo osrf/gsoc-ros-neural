@@ -1,0 +1,18 @@
+<launch>
+	<arg name="address" default="20:68:9D:70:CA:96" />
+  	<node name="mindwave" pkg="mindwave_driver" type="mindwave_node.py" output="screen">
+ 	  <param name="addr" value="$(arg address)" />
+	</node>
+
+	<node pkg="mindwave_teleop" type="quadcopter_teleop_mindwave" name="quadcopter_teleop_mindwave"  output="screen">
+	    <param name="x_vel" value="2" type="double"/>
+	    <param name="y_vel" value="2" type="double"/>
+	    <param name="z_vel" value="1" type="double"/>
+	    <param name="yaw" value="1" type="double"/>
+
+	    <param name="x_attention_threshold" value="85" type="int"/>
+	    <param name="y_attention_threshold" value="65" type="int"/>
+	    <param name="z_attention_threshold" value="50" type="int"/>
+	   	<param name="meditation_threshold" value="90" type="int"/>
+	</node>
+</launch>

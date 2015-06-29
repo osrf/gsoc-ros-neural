@@ -38,6 +38,3 @@ class Listener(object):
             # Do something
             self.parser.listen2() 
             time.sleep(self.interval)
-
-
-        #   *689400 jorge orreaga pacho

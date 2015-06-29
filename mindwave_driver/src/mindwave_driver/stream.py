@@ -7,7 +7,7 @@ from common import Version
 
 class Stream(object):
 
-    def __init__(self, device=None, baudrate=115200, version=Version.MINDWAVE):
+    def __init__(self, device=None, baudrate=115200, version=Version.MINDWAVE_MOBILE):
         
         self.stream = None
         self.version = version
@@ -29,14 +29,6 @@ class Stream(object):
         #missing = bytes
         data = ""
 
-        # while missing > 0:
-        #     if self.version == Version.MINDWAVE_MOBILE:
-        #         data = data + self.stream.recv(missing)
-        #         missing = bytes - len(data)
-        #     elif self.version == Version.MINDWAVE:
-        #         data +=  self.stream.read(missing)
-        #         missing = bytes - len(data)
-        # return data
         try:
             if self.version == Version.MINDWAVE_MOBILE:
                 data = self.stream.recv(bytes)

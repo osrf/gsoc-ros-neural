@@ -23,9 +23,9 @@ class Turtlebot:
         self.loop_rate = rospy.Rate(10) # T = 1/10
         
         self.lastvel = Twist()        
-        self.pub = rospy.Publisher('~cmd_vel', Twist, queue_size=5)
-        self.sub = rospy.Subscriber('/mindwave', Mindwave, self.mindwaveCallback)
-    
+        self.sub = rospy.Subscriber('/mindwave', Mindwave, self.mindwaveCallback, queue_size=100)
+        self.pub = rospy.Publisher('~cmd_vel', Twist, queue_size=10)    
+
     def mindwaveCallback(self, msg):
     
         twist = Twist()
@@ -56,7 +56,7 @@ if __name__=="__main__":
     try:
         turtle = Turtlebot()
         turtle.run()
-        rospy.spin()
+        rospy.spin()        
     except rospy.ROSInterruptException, e:
         print str(e)
         pass

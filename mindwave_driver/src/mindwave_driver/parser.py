@@ -31,12 +31,12 @@ class Parser(object):
                 # PAYLOAD: (EXCODE) | CODE |(VLENGTH) | VALUE
                 if byte1 == Bytes.SYNC and byte2 == Bytes.SYNC:
 
-                    self.buffer.append(byte1)
-                    self.buffer.append(byte2)
+                    #self.buffer.append(byte1)
+                    #self.buffer.append(byte2)
                     data = data[2:]
                     while True:
                         plength = data[0] # 0-169
-                        self.buffer.append(plength)
+                        #self.buffer.append(plength)
                         plength = ord(plength)
                         if plength != 170:
                             break
@@ -57,7 +57,7 @@ class Parser(object):
                         pass
 
                     self.parser_payload(payload)
-                    self.buffer.append(chksum)
+                    #self.buffer.append(chksum)
 
                     data = data[plength+1:]
 
@@ -66,7 +66,7 @@ class Parser(object):
                     #         print '0x%s, ' % b.encode('hex'),
                     # print ""
 
-                    self.buffer = []
+                    #self.buffer = []
                 else:
                    data = data[1:]
 
@@ -137,7 +137,7 @@ class Parser(object):
             except IndexError:
                 pass    
             
-            self.buffer.append(code)
+            #self.buffer.append(code)
             # multibytes
             if ord(code) >= 0x80:
                 
@@ -147,7 +147,7 @@ class Parser(object):
                 except IndexError:
                     pass    
             
-                self.buffer.append(vlength)
+                #self.buffer.append(vlength)
                       
                 if code == BytesStatus.RESPONSE_CONNECTED:
                     # headset found
@@ -182,8 +182,8 @@ class Parser(object):
                 elif code == Bytes.RAW_VALUE:
                     hight = value[0] 
                     low = value[1]
-                    self.buffer.append(hight)
-                    self.buffer.append(low)
+                    #self.buffer.append(hight)
+                    #self.buffer.append(low)
                     self.headset.raw_value = ord(hight)*255+ord(low)
  
                 elif code == Bytes.ASIC_EEG_POWER:
@@ -200,7 +200,7 @@ class Parser(object):
                 # single byte there isn't vlength
                 # 0-127
                 value, payload = payload[0], payload[1:]
-                self.buffer.append(value)
+                #self.buffer.append(value)
 
                 if code == Bytes.POOR_SIGNAL:
                     self.headset.signal = ord(value)

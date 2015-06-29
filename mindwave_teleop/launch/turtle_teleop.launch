@@ -1,7 +1,14 @@
 <launch>
-  <node pkg="mindwave_teleop" type="turtlebot_teleop_mindwave.py" name="turtle_teleop_mindwave"  output="screen">
-    <param name="scale_linear" value="0.5" type="double"/>
-    <param name="scale_angular" value="1.5" type="double"/>
-    <remap from="turtle_teleop_mindwave/cmd_vel" to="cmd_vel_mux/input/teleop"/>
-  </node>
+	<arg name="address" default="20:68:9D:70:CA:96" />
+	<node name="mindwave" pkg="mindwave_driver" type="mindwave_node.py" output="screen">
+	  <param name="addr" value="$(arg address)" />
+	</node>
+	
+	<node pkg="mindwave_teleop" type="turtlebot_teleop_mindwave.py" name="turtle_teleop_mindwave"  output="screen">
+		<param name="scale_linear" value="0.5" type="double"/>
+		<param name="scale_angular" value="1.5" type="double"/>
+		<param name="meditation_threshold" value="70" type="int"/>
+		<param name="attention_threshold" value="30 type="int"/>
+		<remap from="turtle_teleop_mindwave/cmd_vel" to="cmd_vel_mux/input/teleop"/>
+	</node>
 </launch>

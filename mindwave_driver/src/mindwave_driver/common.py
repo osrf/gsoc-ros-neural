@@ -1,5 +1,7 @@
 
-# protocol 
+# global variables 
+DEFAULT_BYTES = 500
+
 class Bytes:
     SYNC            = '\xaa'
     POOR_SIGNAL     = '\x02'
@@ -32,4 +34,3 @@ class Version:
     MINDWAVE = "MindWave"
     MINDWAVE_MOBILE = "MindWave Mobile"
 
-DEFAULT_BYTES = 1000

@@ -1,0 +1,28 @@
+<launch>
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="paused" value="false" />
+    <arg name="gui" value="true" />
+  </include>
+  <!--
+  <param name="robot_description" command="$(find xacro)/xacro.py $(find ur_description)/urdf/ur5.urdf.xacro" /> 
+  -->
+  <param name="robot_description" textfile="$(find ur_description)/urdf/ur5_robot.urdf"/>
+  
+  <node name="spawner" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -z 0.01 -model ur5" respawn="false" output="screen"/>
+</launch>
+
+<!--
+<launch>
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="paused" value="false" />
+    <arg name="gui" value="true" />
+  </include>
+
+  <include file="$(find ur_description)/launch/ur5_upload.launch">
+    <arg name="gui" value="true" />
+  </include>
+
+  <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -model robot" output="screen"/>
+</launch>
+
+-->

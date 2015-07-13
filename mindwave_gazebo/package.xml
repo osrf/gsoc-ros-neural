@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package>
+  <name>mindwave_gazebo</name>
+  <version>1.0.0</version>
+  <description>
+      Gazebo packages for controling robots with Mindwave.
+  </description>
+
+  <license>BSD</license>
+
+  <author>Steve Ataucuri</author>
+  <maintainer email="lord.ataucuri@ucsp.edu.pe">Steve</maintainer>
+  <buildtool_depend>catkin</buildtool_depend>
+  
+</package>

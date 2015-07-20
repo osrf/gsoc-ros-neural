@@ -21,9 +21,6 @@ In order to be able to run the nodes, it is necessary, at first, clone or instal
 * pip install pybluez
 * If you use python 2.7 install : pip install enum34
 
-#### Summary of set up ####
-
-
 ### What contain folders? ###
 
 * **mindwave_driver:** driver of Mindwave and files of the node

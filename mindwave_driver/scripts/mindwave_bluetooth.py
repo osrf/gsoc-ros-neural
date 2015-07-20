@@ -18,13 +18,13 @@ while True:
         headset.connect(headset.addr)
         time.sleep(1)
     elif headset.status == Status.CONNECTED:
-        print "quality signal: %s , attention %s , meditation %s , raw %s " % (headset.signal, headset.attention, \
-        	headset.meditation, headset.raw_value)
+        print "quality signal: %s, attention %s, meditation %s, blink %s, raw %s" % (headset.signal, headset.attention, \
+        	headset.meditation, headset.blink, headset.raw_value)
         # delta, theta, low-alpha, high-alpha, low-beta, high-beta,
-        # # low-gamma, high-gamma
-        # for e in headset.asig_eeg_power:
-        # 	print ord(e),
-        # print ""
+        # low-gamma, high-gamma
+        for e in headset.asig_eeg_power:
+            print e,
+        print ""
     else:
         pass
-    time.sleep(0.25)
+    time.sleep(0.2)

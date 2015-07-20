@@ -3,17 +3,42 @@ project(mindwave_teleop)
 
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
-	message_generation geometry_msgs roscpp
+	message_generation 
+	geometry_msgs 
+	roscpp 
+	std_msgs
+	actionlib
+	joint_trajectory_action
+	kinematics_msgs
+	pr2_controllers_msgs
+  control_msgs
+	tf
 )
 
 catkin_package(
   INCLUDE_DIRS
-  CATKIN_DEPENDS geometry_msgs mindwave_msgs rospy roscpp
+  CATKIN_DEPENDS 
+  	geometry_msgs 
+  	mindwave_msgs 
+  	rospy 
+  	roscpp 
+  	actionlib 
+  	joint_trajectory_action 
+  	kinematics_msgs 
+  	pr2_controllers_msgs
+    control_msgs
+  	tf
   DEPENDS
 )
 
 add_executable(quadcopter_teleop_mindwave src/quadcopter_teleop_mindwave.cpp)
 target_link_libraries(quadcopter_teleop_mindwave ${catkin_LIBRARIES})
+
+add_executable(ur10_ik_move_arm src/ur10_ik_move_arm.cpp)
+target_link_libraries(ur10_ik_move_arm ${catkin_LIBRARIES})
+
+add_executable(ur10_simple_move_arm src/ur10_simple_move_arm.cpp)
+target_link_libraries(ur10_simple_move_arm ${catkin_LIBRARIES})
 
 #############
 ## Install ##
@@ -25,7 +50,7 @@ install(PROGRAMS
  	DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-install(TARGETS quadcopter_teleop_mindwave
+install(TARGETS quadcopter_teleop_mindwave ur10_ik_move_arm ur10_simple_move_arm
 	DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

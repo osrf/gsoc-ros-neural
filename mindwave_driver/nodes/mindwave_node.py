@@ -51,8 +51,8 @@ class MindwaveNode:
       
             #rospy.loginfo(msg)
             self.pub.publish(msg)
-            self.loop_rate.sleep()
-            #rospy.sleep(0.5)
+            #self.loop_rate.sleep()
+            rospy.sleep(0.1)
 
         self.headset.close()
 

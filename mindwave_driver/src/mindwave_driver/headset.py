@@ -16,6 +16,7 @@ class Headset:
         self.meditation = 0 # 0-100
         self.attention = 0 # 0-100
         self.signal = 0
+        self.blink = 0
         self.status = None
 
         self.raw_value = 0

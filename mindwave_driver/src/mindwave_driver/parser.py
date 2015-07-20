@@ -1,7 +1,12 @@
 
 
 def bigend_24b(b1, b2, b3):
-    return b1* 255 * 255 + 255 * b2 + b3
+    b1 = int(b1, 16)
+    b2 = int(b2, 16)
+    b3 = int(b3, 16)
+    
+    return (b1*256*256) + (256*b2) + b3
+    #return int(b1,16)*65536+int(b2,16)*256+int(b3,16)
 
 class Parser(object):
     def __init__(self, headset, stream):
@@ -185,6 +190,10 @@ class Parser(object):
                     #self.buffer.append(hight)
                     #self.buffer.append(low)
                     self.headset.raw_value = ord(hight)*255+ord(low)
+                    #self.headset.raw_value = int(hight, 16)*256+int(low, 16)
+
+                    if self.headset.raw_value > 32768:
+                        self.headset.raw_value = self.headset.raw_value - 65536 
  
                 elif code == Bytes.ASIC_EEG_POWER:
                     # ASIC_EEG_POWER_INT
@@ -192,8 +201,10 @@ class Parser(object):
                     # low-gamma, high-gamma
 
                     self.headset.asig_eeg_power = []
+                    print "length egg_power:", len(value)
                     for i in range(8):
-                        self.headset.asig_eeg_power.append(bigend_24b(value[0], value[1], value[2]))
+                        self.headset.asig_eeg_power.append(
+                            bigend_24b(value[i], value[i+1], value[i+2]))
                 else: #unknow multibyte
                     pass
             else:   
@@ -203,13 +214,13 @@ class Parser(object):
                 #self.buffer.append(value)
 
                 if code == Bytes.POOR_SIGNAL:
-                    self.headset.signal = ord(value)
+                    self.headset.signal = ord(value) #int(value,16) 
                 elif code == Bytes.ATTENTION:
-                    self.headset.attention = ord(value)
+                    self.headset.attention = ord(value) # int(value,16) # ord(value)
                 elif code == Bytes.MEDITATION:
-                    self.headset.meditation = ord(value)
+                    self.headset.meditation = ord(value) #int(value,16) #ord(value)
                 elif code == Bytes.BLINK:
-                    self.headset.blink = ord(value)
+                    self.headset.blink = ord(value) #int(value,16) # ord(value)
                 else: 
                     pass
 

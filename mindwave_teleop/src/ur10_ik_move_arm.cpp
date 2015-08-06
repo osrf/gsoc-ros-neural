@@ -12,7 +12,12 @@
 
 #define MAX_JOINT_VEL 0.5  //in radians/sec
 
-static const std::string ARM_IK_NAME = "/ur10_arm_kinematics/get_ik";
+static const std::string ARM_IK_NAME = "/kinematics_msgs/GetPositionIK";
+//static const std::string ARM_IK_NAME = "/execute_cartesian_ik_trajectory";
+//static const std::string ARM_IK_NAME = "/arm_controller/follow_joint_trajectory";
+
+
+
 typedef actionlib::SimpleActionClient<pr2_controllers_msgs::JointTrajectoryAction> TrajClient;
 
 class IKTrajectoryExecutor{
@@ -30,8 +35,7 @@ public:
   IKTrajectoryExecutor(){
 
     //create a client function for the IK service
-    ik_client = node.serviceClient<kinematics_msgs::GetPositionIK>
-      (ARM_IK_NAME, true);    
+    ik_client = node.serviceClient<kinematics_msgs::GetPositionIK>(ARM_IK_NAME, true);    
 
     //wait for the various services to be ready
     ROS_INFO("Waiting for services to be ready");
@@ -47,7 +51,7 @@ public:
       ROS_INFO("Waiting for the joint_trajectory_action action server to come up");
     }
 
-    //register a service to input desired Cartesian trajectories
+    //register a service server to input desired Cartesian trajectories
     service = node.advertiseService("execute_cartesian_ik_trajectory", 
       &IKTrajectoryExecutor::execute_cartesian_ik_trajectory, this);
 
@@ -82,7 +86,7 @@ public:
     kinematics_msgs::GetPositionIK::Response ik_response;  
  
     ik_request.timeout = ros::Duration(5.0);
-ik_request.ik_request.ik_seed_state.joint_state.name.push_back("shoulder_pan_joint");
+    ik_request.ik_request.ik_seed_state.joint_state.name.push_back("shoulder_pan_joint");
     ik_request.ik_request.ik_seed_state.joint_state.name.push_back("shoulder_lift_joint");
     ik_request.ik_request.ik_seed_state.joint_state.name.push_back("elbow_joint");
     ik_request.ik_request.ik_seed_state.joint_state.name.push_back("wrist_1_joint");

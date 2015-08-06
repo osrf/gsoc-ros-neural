@@ -1,0 +1,10 @@
+<launch>
+
+  <node pkg ="mindwave_execute_trajectory"
+	type="mindwave_execute_trajectory_node"
+        name="mindwave_execute_trajectory"
+        output="screen">
+  </node>
+
+</launch>
+

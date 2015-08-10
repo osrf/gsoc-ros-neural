@@ -1,0 +1,50 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <!-- We use a custom world for the rrbot so that the camera angle is launched correctly -->
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- Global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <model name="table_1">
+      <include>
+        <uri>model://cafe_table</uri>
+        <pose>1.0 0.09 -0.01 0.0 0.0 0.0</pose>
+      </include>
+    </model>
+    
+    <model name="table_2">
+      <include>
+        <uri>model://cafe_table</uri>
+        <pose>-1.645550 -0.315975 0.0 0.0 0.0 0.0</pose>
+      </include>
+    </model>
+
+    <model name="coke">
+      <include>
+        <uri>model://coke_can</uri>
+        <pose>0.915 0.2 0.805 0.0 0.0 0.0</pose>
+      </include>
+    </model>
+
+    <!-- Focus camera on tall pendulum -->
+    <gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose>4.927360 -4.376610 3.740080 0.000000 0.275643 2.356190</pose>
+        <view_controller>orbit</view_controller>
+      </camera>
+    </gui>
+
+    <state world_name='default'>
+      <sim_time>0 0</sim_time>
+      <real_time>0 0</real_time>
+      <wall_time>0 0</wall_time>
+    
+    </state>
+  </world>
+</sdf>

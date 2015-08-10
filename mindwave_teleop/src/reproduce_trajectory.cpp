@@ -11,11 +11,11 @@
 
 using namespace std;
 
-const std::string trajFiles[2]={"home_pose.txt","end_pose.txt"};
+const std::string trajFiles[2]={"init_pose.csv"};
 
 int main (int argc, char **argv)
 {
-  ros::init(argc, argv, "executor_node");
+  ros::init(argc, argv, "reproduce_trajectory_node");
 
   // Start the service
   ros::NodeHandle nh;
@@ -25,8 +25,8 @@ int main (int argc, char **argv)
 
   int i = 0;
 
-  while (ros::ok())
-  {
+  //while (ros::ok())
+  //{
     
       trajectory.request.file = ros::package::getPath("mindwave_execute_trajectory") + "/config/" + trajFiles[i];
       ROS_INFO("Executing trajectory %s", trajFiles[i].c_str());
@@ -34,14 +34,14 @@ int main (int argc, char **argv)
       if (!traj_client_.call(trajectory))
       {
           ROS_ERROR ("Failed to execute [%s] trajectory", trajFiles[i].c_str());
-          break;
+          //break;
       }
 
       i = (i + 1) % 2;
 
       ros::spinOnce();
       usleep(100000);
-  }
+  //}
 
   return 0;
 }

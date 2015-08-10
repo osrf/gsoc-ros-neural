@@ -89,12 +89,13 @@ public:
     // Positions
     ind += 1;
     goal.trajectory.points[ind].positions.resize(6);
-    goal.trajectory.points[ind].positions[0] = -2.5;
-    goal.trajectory.points[ind].positions[1] = -2.5;
-    goal.trajectory.points[ind].positions[2] = -0.1;
-    goal.trajectory.points[ind].positions[3] = -1.2;
-    goal.trajectory.points[ind].positions[4] = 1.5;
-    goal.trajectory.points[ind].positions[5] = -0.3;
+
+    goal.trajectory.points[ind].positions[0] = 1.4825;
+    goal.trajectory.points[ind].positions[1] = -1.6237;
+    goal.trajectory.points[ind].positions[2] = 2.4003;
+    goal.trajectory.points[ind].positions[3] = 2.0473;
+    goal.trajectory.points[ind].positions[4] = -1.6237;
+    goal.trajectory.points[ind].positions[5] = 0.0;
 
     // Velocities
     goal.trajectory.points[ind].velocities.resize(6);

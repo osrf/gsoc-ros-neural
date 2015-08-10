@@ -9,8 +9,10 @@
 #include <std_srvs/Empty.h>
 #include "mindwave_execute_trajectory/ExecTraj.h"
 
+
 using namespace std;
 
+// https://github.com/uos/katana_driver/blob/indigo_catkin/katana_tutorials/src/follow_joint_trajectory_client.cpp
 typedef  vector< vector <double> > Trajectory;
 typedef actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction> TrajClient;
 
@@ -50,7 +52,7 @@ public:
         traj_client->sendGoal( buildGoal (trajectory) );
 
         //wait for the action to return
-        bool finished_before_timeout = traj_client->waitForResult(ros::Duration(1.0));
+        bool finished_before_timeout = traj_client->waitForResult(ros::Duration(50.0));
 
         if (finished_before_timeout)
         {
@@ -70,12 +72,17 @@ public:
     {
       ROS_INFO("Printing list of points of the trajectory.");
 
+      cout<<"tam traj "<<trajectory.size()<<endl;
+      
       for(int i=0 ; i < trajectory.size(); i++)
       {
-        std::vector<double> point = trajectory.at(i);
 
-        for(int x=0 ; x < point.size(); x++)
+        std::vector<double> point = trajectory.at(i);
+        cout<<"tam "<<point.size()<<endl;
+        for(int x=0 ; x < point.size(); x++){
+         
           cout<<point.at(x)<<",";
+        }
         cout<<endl;
       }
 
@@ -100,20 +107,34 @@ public:
           size_t pos = 0;
           std::string token;
           vector<double> point;
+          
           while ((pos = line.find(delimiter)) != std::string::npos)
           {
             token = (line.substr(0, pos));
+            
             point.push_back (strtod(token.c_str(),NULL));
             line.erase(0, pos + delimiter.length());
+            
           }
+
+          // last token
+          if(line.length()>0)
+            point.push_back (strtod(line.c_str(),NULL));
+
           listOfPoints.push_back(point);
         }
         myfile.close();
       }
       else
-        ROS_ERROR( "Unable to open file [%s]", fileName.c_str());
+        cout<< "Unable to open file [%s]"<< fileName.c_str();
 
-      return listOfPoints;
+      return listOfPoints;    
+    }
+
+    //! Returns the current state of the action
+    actionlib::SimpleClientGoalState getState()
+    {
+      return traj_client->getState();
     }
 
  private:
@@ -123,7 +144,7 @@ public:
         control_msgs::FollowJointTrajectoryGoal goal;
 
         goal.trajectory.header.stamp = ros::Time::now()  + ros::Duration(1.0);
-        //goal.trajectory.header.frame_id = "link_base";
+        goal.trajectory.header.frame_id = "link_base";
 
         // First, the joint names, which apply to all waypoints for Universal Robots
         goal.trajectory.joint_names.push_back("shoulder_pan_joint");
@@ -148,24 +169,24 @@ public:
             goal.trajectory.points[i].accelerations.resize(6);
 
             goal.trajectory.points[i].positions[0] = point.at(0);
-            //goal.trajectory.points[i].velocities[0] = point.at(7);
-
+            goal.trajectory.points[i].velocities[0] = 0.0;
+         
             goal.trajectory.points[i].positions[1] = point.at(1);
-            //goal.trajectory.points[i].velocities[1] = point.at(8);
-
+            goal.trajectory.points[i].velocities[1] = 0.0;
+          
             goal.trajectory.points[i].positions[2] = point.at(2);
-            //goal.trajectory.points[i].velocities[2] = point.at(9);
-
+            goal.trajectory.points[i].velocities[2] = 0.0;
+            
             goal.trajectory.points[i].positions[3] = point.at(3);
-            //goal.trajectory.points[i].velocities[3] = point.at(10);
-
+            goal.trajectory.points[i].velocities[3] = 0.0;
+          
             goal.trajectory.points[i].positions[4] = point.at(4);
-            //goal.trajectory.points[i].velocities[4] = point.at(11);
-
+            goal.trajectory.points[i].velocities[4] = 0.0;
+           
             goal.trajectory.points[i].positions[5] = point.at(5);
-            //goal.trajectory.points[i].velocities[5] = point.at(12);
-
-            goal.trajectory.points[i].positions[6] = point.at(6);
+            goal.trajectory.points[i].velocities[5] = 0.0;
+            
+            //goal.trajectory.points[i].positions[6] = point.at(6);
             //goal.trajectory.points[i].velocities[6] = point.at(13);
 
             // To be reached 1 second after starting along the trajectory
@@ -182,8 +203,7 @@ bool trajectory_execution_callback(mindwave_execute_trajectory::ExecTraj::Reques
                                    mindwave_execute_trajectory::ExecTraj::Response &res)
 {
     Trajectories traj;
-    traj.printTraj(traj.readFile(req.file));
-
+  
     if (traj.exec(req.file) == "ok")
     {
       return true;
@@ -203,8 +223,6 @@ int main (int argc, char **argv)
   {
     Trajectories traj;
     std::string file(argv[1]);
-
-    traj.printTraj(traj.readFile(file));
     traj.exec(file);
   }
 

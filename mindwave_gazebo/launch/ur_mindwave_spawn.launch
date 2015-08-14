@@ -1,28 +1,25 @@
 <launch>
-  <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="paused" value="false" />
-    <arg name="gui" value="true" />
-  </include>
-  <!--
-  <param name="robot_description" command="$(find xacro)/xacro.py $(find ur_description)/urdf/ur5.urdf.xacro" /> 
-  -->
-  <param name="robot_description" textfile="$(find ur_description)/urdf/ur5_robot.urdf"/>
   
-  <node name="spawner" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -z 0.01 -model ur5" respawn="false" output="screen"/>
-</launch>
+  <arg name="paused" default="true"/>
+  <arg name="use_sim_time" default="true"/>
+  <arg name="gui" default="true"/>
+  <arg name="headless" default="false"/>
+  <arg name="debug" default="false"/>
 
-<!--
-<launch>
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="paused" value="false" />
-    <arg name="gui" value="true" />
+    <arg name="world_name" value="$(find mindwave_gazebo)/worlds/objects.world"/> 
+    <arg name="debug" value="$(arg debug)" />
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+    <arg name="headless" value="$(arg headless)"/>
   </include>
 
-  <include file="$(find ur_description)/launch/ur5_upload.launch">
-    <arg name="gui" value="true" />
-  </include>
+  <!-- <param name="robot_description" textfile="$(find ur_description)/urdf/ur10_with_manipulator.urdf"/> -->
 
-  <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -model robot" output="screen"/>
+  <param name="robot_description" command="$(find xacro)/xacro.py '$(find ur_description)/urdf/ur10_with_manipulator.urdf.xacro'" />
+
+  <node name="spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+    args="-urdf -param robot_description -x -0.08 -y -0.09  -z 0.5 -model ur10" />
+
 </launch>
-
--->

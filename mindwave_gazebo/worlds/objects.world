@@ -14,23 +14,170 @@
     <model name="table_1">
       <include>
         <uri>model://cafe_table</uri>
-        <pose>1.0 0.09 -0.01 0.0 0.0 0.0</pose>
-      </include>
-    </model>
-    
-    <model name="table_2">
-      <include>
-        <uri>model://cafe_table</uri>
-        <pose>-1.645550 -0.315975 0.0 0.0 0.0 0.0</pose>
+        <!-- <pose>1.022671 0.039892 0.0 0.0 0.0 0.0</pose> -->
+        <pose>0.65011 -0.017175 0.0 0.0 0.0 0.0</pose>
       </include>
     </model>
 
     <model name="coke">
       <include>
         <uri>model://coke_can</uri>
-        <pose>0.915 0.2 0.805 0.0 0.0 0.0</pose>
-      </include>
+          <!-- <pose>0.915 0.3 0.805 0.0 0.0 0.0</pose> -->
+          <pose>0.403709 0.353107 0.771112 0.0 0.0 0.0</pose>
+        </include>
+    </model> 
+
+    <model name='cylinder_base'>
+      <pose>-0.091217 -0.085776 0.5 0 -0 0</pose>
+      <link name='cylinder_link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+             <cylinder>
+              <length>1.0</length>
+              <radius>0.1</radius>
+             </cylinder>
+            <!--<box>
+                  <size>0.5 0.5 0.55</size>
+                </box>
+            -->
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <!--<box>
+              <size>0.5 0.5 1.0</size>
+            </box> -->
+             <cylinder>
+              <length>1.0</length>
+              <radius>0.1</radius>
+             </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Gray</name>
+            </script>
+          </material>
+        </visual>
+        <velocity_decay>
+          <linear>0</linear>
+          <angular>0</angular>
+        </velocity_decay>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+        <gravity>1</gravity>
+      </link>
+      <static>1</static>
     </model>
+
+    <!-- Kinect and its plugin -->
+    <model name='kinect'>
+      <pose>1.77 0.0 1.45 0.0 0.7 3.14</pose>
+      <link name='/camera_depth_optical_frame'>
+        <inertial>
+          <mass>0.1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>0.073 0.276 0.072</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <bounce/>
+            <friction>
+              <ode/>
+            </friction>
+            <contact>
+              <ode/>
+            </contact>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://kinect/meshes/kinect.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <sensor name='camera' type='depth'>
+          <update_rate>20</update_rate>
+          <camera name='__default__'>
+            <horizontal_fov>1.0472</horizontal_fov>
+            <image>
+              <width>640</width>
+              <height>480</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.05</near>
+              <far>3</far>
+            </clip>
+          </camera>
+
+         <plugin name='kinect_camera_controller' filename='libgazebo_ros_openni_kinect.so'>
+            <cameraName>camera</cameraName>
+            <alwaysOn>true</alwaysOn>
+            <updateRate>10</updateRate>
+            <imageTopicName>rgb/image_raw</imageTopicName>
+            <depthImageTopicName>depth/image_raw</depthImageTopicName>
+            <pointCloudTopicName>depth/points</pointCloudTopicName>
+            <cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>
+            <depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>
+            <frameName>camera_depth_optical_frame</frameName>
+            <baseline>0.1</baseline>
+            <distortion_k1>0.0</distortion_k1>
+            <distortion_k2>0.0</distortion_k2>
+            <distortion_k3>0.0</distortion_k3>
+            <distortion_t1>0.0</distortion_t1>
+            <distortion_t2>0.0</distortion_t2>
+            <pointCloudCutoff>0.4</pointCloudCutoff>
+            <robotNamespace>/</robotNamespace>
+          </plugin>
+          <!-- <pose>-0.118 0 1.5 -0.8 -0 0</pose> -->
+
+        </sensor>
+        <velocity_decay>
+          <linear>0</linear>
+          <angular>0</angular>
+        </velocity_decay>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+        <gravity>1</gravity>
+      </link>
+      <static>1</static>
+    </model>
+
 
     <!-- Focus camera on tall pendulum -->
     <gui fullscreen='0'>

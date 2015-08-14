@@ -1,3 +1,4 @@
 .idea/
 test/
 *.pyc
+mindwave_execute_trajectory/bags

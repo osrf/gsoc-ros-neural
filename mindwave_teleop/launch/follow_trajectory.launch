@@ -1,3 +1,4 @@
 <launch>	
-	<node pkg="rosbag" type="record" name="joint_states" args="record /joint_states -o $(mindwave_teleop)/bags/trajectory" output="screen" />
+	<node pkg="rosbag" type="record" name="joint_states" args="record /joint_states -o $(find mindwave_execute_trajectory)/bags/trajectory" output="screen" />
+	
 </launch>

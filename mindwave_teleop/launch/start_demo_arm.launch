@@ -1,0 +1,11 @@
+<launch>
+  <include file="$(find mindwave_execute_trajectory)/launch/start_service.launch"/>
+
+  <node pkg ="mindwave_teleop" type="reproduce_trajectory_node" name="reproduce_trajectory_node"
+        output="screen">
+	    <param name="attention_threshold" value="50" type="int"/>
+	   	<param name="meditation_threshold" value="80" type="int"/>
+  </node>
+
+</launch>
+

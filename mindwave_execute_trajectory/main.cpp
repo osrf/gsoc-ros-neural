@@ -52,7 +52,7 @@ public:
         traj_client->sendGoal( buildGoal (trajectory) );
 
         //wait for the action to return
-        bool finished_before_timeout = traj_client->waitForResult(ros::Duration(50.0));
+        bool finished_before_timeout = traj_client->waitForResult(ros::Duration(5.0));
 
         if (finished_before_timeout)
         {

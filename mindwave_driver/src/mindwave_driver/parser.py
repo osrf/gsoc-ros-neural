@@ -201,10 +201,10 @@ class Parser(object):
                     # low-gamma, high-gamma
 
                     self.headset.asig_eeg_power = []
-                    print "length egg_power:", len(value)
-                    for i in range(8):
-                        self.headset.asig_eeg_power.append(
-                            bigend_24b(value[i], value[i+1], value[i+2]))
+                    #print "length egg_power:", len(value)
+                    #for i in range(8):
+                    #    self.headset.asig_eeg_power.append(
+                    #        bigend_24b(value[i], value[i+1], value[i+2]))
                 else: #unknow multibyte
                     pass
             else:   

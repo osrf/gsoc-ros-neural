@@ -21,6 +21,8 @@
   <build_depend>pr2_controllers_msgs</build_depend>
   <build_depend>tf</build_depend>
   <build_depend>roslib</build_depend>
+  <build_depend>robotiq_s_model_articulated_msgs</build_depend>
+
 
 
   <run_depend>roscpp</run_depend>
@@ -34,5 +36,6 @@
   <run_depend>pr2_controllers_msgs</run_depend>
   <run_depend>tf</run_depend>
   <run_depend>roslib</run_depend>
+  <run_depend>robotiq_s_model_articulated_msgs</run_depend>
 
 </package>

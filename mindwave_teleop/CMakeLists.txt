@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   control_msgs
 	tf
   roslib
+  robotiq_s_model_articulated_msgs
 )
 
 catkin_package(
@@ -30,6 +31,7 @@ catkin_package(
     control_msgs
   	tf
     roslib
+    robotiq_s_model_articulated_msgs
   DEPENDS
 )
 

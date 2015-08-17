@@ -1,4 +1,5 @@
 <launch>
+  <!-- Start service node of execution of trajectories -->
   <include file="$(find mindwave_execute_trajectory)/launch/start_service.launch"/>
 
   <node pkg ="mindwave_teleop" type="reproduce_trajectory_node" name="reproduce_trajectory_node"

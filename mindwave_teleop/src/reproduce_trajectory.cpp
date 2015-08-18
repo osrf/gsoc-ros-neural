@@ -4,13 +4,17 @@
 
 #include <string>
 
-#include <mindwave_execute_trajectory/ExecTraj.h>
 #include <robotiq_s_model_articulated_msgs/SModelRobotInput.h>
 #include <robotiq_s_model_articulated_msgs/SModelRobotOutput.h>
+//#include <robotiq_msgs/SModelRobotInput.h>
+//#include <robotiq_msgs/SModelRobotOutput.h>
+
+
 #include <mindwave_msgs/Mindwave.h>
+#include <mindwave_execute_trajectory/ExecTraj.h>
 
 /*
- This node class execute a predefined trajectory and
+ This node class executes a predefined trajectory and
  interoperate with Mindwave message.
 */
 
@@ -31,7 +35,8 @@ class ArmTeleop
   bool picked;
   bool positioned;
 
-  const std::string trajFiles[2]={"pick.csv", "place.csv"};
+
+  const std::string trajFiles[2]={"pick2.csv", "place2.csv"};
 
   public: 
   ArmTeleop()
@@ -58,7 +63,9 @@ class ArmTeleop
 
     //mindwave_execute_trajectory::ExecTraj trajectory;
 
-    ROS_INFO("Executing a predefined trajectory %s", trajFiles[0].c_str());  
+    ROS_INFO("Executing a predefined trajectory %s", trajFiles[0].c_str()); 
+
+    control_gripper(true);
 
   }
   
@@ -121,15 +128,15 @@ class ArmTeleop
       // publish the rostopic to open hand
       //rostopic pub --once left_hand/command robotiq_s_model_articulated_msgs/SModelRobotOutput {1,0,1,0,0,0,0,255,0,155,0,0,255,0,0,0,0,0}
       cmd.rACT = 1;
-      cmd.rMOD = 0;
+      cmd.rMOD = 1;
       cmd.rGTO = 1;
       cmd.rATR = 0;
       cmd.rICF = 0;
       cmd.rICS = 0;
-      cmd.rPRA = 0;
-      cmd.rSPA = 255;
-      cmd.rFRA = 0;
-      cmd.rPRB = 155;
+      cmd.rPRA = 0; // open, close
+      cmd.rSPA = 255; // speed 22~110
+      cmd.rFRA = 255; // force 15~60
+      cmd.rPRB = 155; 
       cmd.rSPB = 0;
       cmd.rFRB = 0;
       cmd.rPRC = 255;

@@ -3,8 +3,6 @@
 import rospy
 import roslib
 
-roslib.load_manifest('mindwave_teleop')
-
 from geometry_msgs.msg import Twist
 from mindwave_msgs.msg import Mindwave
 

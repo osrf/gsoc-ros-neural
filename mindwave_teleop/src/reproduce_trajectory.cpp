@@ -74,7 +74,7 @@ class ArmTeleop
   void mindwaveCallback(const mindwave_msgs::Mindwave msg){
     
 
-    if(msg.attention > a_threshold && !picked && !positioned)  
+    if(msg.attention >= a_threshold && !picked && !positioned)  
     {
       
       trajectory.request.file = ros::package::getPath("mindwave_execute_trajectory") + 
@@ -89,14 +89,14 @@ class ArmTeleop
       usleep(100000);
       positioned = true;
 
-    } if(msg.meditation > m_threshold && !picked && positioned)
+    } if(msg.meditation >= m_threshold && !picked && positioned)
     {
       // close that hand
       control_gripper(false);
       picked = true;
     }
     
-    if(msg.attention > a_threshold && picked && positioned)  
+    if(msg.attention >= a_threshold && picked && positioned)  
     {
 
       trajectory.request.file = ros::package::getPath("mindwave_execute_trajectory") + 
@@ -112,7 +112,7 @@ class ArmTeleop
 
       positioned = false;
 
-    } if (msg.meditation > m_threshold && picked && !positioned)
+    } if (msg.meditation >= m_threshold && picked && !positioned)
     {
       control_gripper(true);
       picked = false;

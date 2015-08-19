@@ -1,0 +1,21 @@
+<package>
+  <name>ros_neural</name>
+  <version>1.0.0</version>
+  <description>
+    The ros neural package for the mindwave headset
+  </description>
+  <author>Steve Ataucuri Cruz</author>
+  <maintainer email="lord.ataucuri@ucsp.edu.pe">Steve</maintainer>
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <run_depend>mindwave_msgs</run_depend>
+  <run_depend>mindwave_driver</run_depend>
+  <run_depend>mindwave_execute_trajectory</run_depend>
+  <run_depend>mindwave_gazebo</run_depend>
+  <run_depend>mindwave_teleop</run_depend>
+  
+  <export>
+    <metapackage/>
+  </export>
+</package>

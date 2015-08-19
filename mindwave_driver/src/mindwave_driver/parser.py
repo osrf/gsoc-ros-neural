@@ -1,6 +1,6 @@
 
-
-def bigend_24b(b1, b2, b3):
+def bigend_24b(self, b1, b2, b3):
+    """This function convert big endian bytes to readable value 0~255"""
     b1 = int(b1, 16)
     b2 = int(b2, 16)
     b3 = int(b3, 16)
@@ -9,6 +9,11 @@ def bigend_24b(b1, b2, b3):
     #return int(b1,16)*65536+int(b2,16)*256+int(b3,16)
 
 class Parser(object):
+    """The parser class for a chunk of data from the Mindwave 
+
+    It parsers the data according to the mindwave protocol
+    """
+
     def __init__(self, headset, stream):
         self.headset = headset
         self.stream = stream
@@ -22,6 +27,11 @@ class Parser(object):
             print '0x%s, ' % b.encode('hex'),
 
     def parser(self, data):
+        """This method parse a chunk of bytes 
+
+        It splits the incoming bytes in payload data
+        """
+
         # settings = self.stream.getSettingsDict()   
 
         # for i in xrange(2):
@@ -78,62 +88,11 @@ class Parser(object):
             except IndexError:
                 pass
 
-
-
-    def listen(self):
-        # settings = self.stream.getSettingsDict()   
-
-        # for i in xrange(2):
-        #     settings['rtscts'] = not settings['rtscts']
-        #     self.stream.applySettingsDict(settings)
-
-        #if self.stream.isOpen():
-           #while True:
-        byte1 = self.stream.read(1)
-        byte2 = self.stream.read(1)                      
-
-        self.buffer.append(byte1)
-        self.buffer.append(byte2)
-        
-        # SYNC | SYNC | PLENGTH | (EXCODE) | CODE |(VLENGTH) | VALUE
-        if byte1 == Bytes.SYNC and byte2 == Bytes.SYNC:
-         
-            while True:
-                plength = self.stream.read() # 0-169
-                self.buffer.append(plength)
-                plength = ord(plength)
-                if plength != 170: 
-                    break
-            if plength > 169: # return to while
-                pass #continue        
-            
-            payload = self.stream.read(plength)
-            checksum = 0
-            checksum = sum(ord(b) for b in payload[:-1])
-            checksum &= 0xff
-            checksum = ~checksum & 0xff
-
-            chksum = self.stream.read()
-
-            if checksum != ord(chksum):
-                pass
-
-            #print 'payload ', payload.encode('hex')
-            self.parser_payload(payload)
-            self.buffer.append(chksum)
-
-            # for b in self.buffer:
-            #     if not b == "":
-            #         print '0x%s, ' % b.encode('hex'),
-            # print ""
-
-            self.buffer = []
-        else:
-            pass        
-        #else:
-        #    print 'no stream open'
-
     def parser_payload(self, payload):
+        """This method gets the eMeter values
+
+        It receives the data payload and parse it to find Concentration and Meditation values 
+        """
 
         while payload:
             

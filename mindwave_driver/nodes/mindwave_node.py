@@ -4,15 +4,14 @@ import rospy
 import roslib
 import time
 
-# old version of ros
-roslib.load_manifest('mindwave_driver')
-
 from mindwave_driver.bluetooth_headset import BluetoothHeadset
 from mindwave_driver.common import *
 
 from mindwave_msgs.msg import Mindwave
 
 class MindwaveNode:
+    """the Ros node for Mindwave message"""
+
     def __init__(self):
         
         rospy.init_node('mindwave_node', anonymous=True)     
@@ -25,15 +24,19 @@ class MindwaveNode:
             self.headset = BluetoothHeadset()
             self.addr = self.headset.addr
 
-        print "Initializing node with addr ... ", self.addr
-
         self.pub = rospy.Publisher('mindwave', Mindwave, queue_size=10)
         
         self.loop_rate = rospy.Rate(10)
 
-        print "Publishing ... "
+        rospy.loginfo("Publishing the ros message for mindwave at addr %s ...", self.addr)
 
     def update(self):
+        """This method publishes the Mindwave ros message
+
+        It publishes the Attention and Meditation values, these are
+        the main messages to control robots.
+        """
+
         msg = Mindwave()
         while not rospy.is_shutdown():
            
@@ -62,5 +65,5 @@ if __name__ == '__main__':
         node.update() 
         rospy.spin()
     except rospy.ROSInterruptException, e:
-        print str(e)
+        rospy.logerr(str(e))
         pass

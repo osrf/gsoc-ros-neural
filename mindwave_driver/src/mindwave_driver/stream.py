@@ -6,15 +6,22 @@ import serial
 from common import Version
 
 class Stream(object):
+    """The stream class represents a source of data
+
+    It can be a source of BluetoothSocket or Serial streams   
+
+    """
 
     def __init__(self, device=None, baudrate=115200, version=Version.MINDWAVE_MOBILE):
-        
+         
         self.stream = None
         self.version = version
         
         self.open()
 
     def open(self):
+        """Open a connection with mindwave through via socket or serial"""
+
         try:
             if self.version == Version.MINDWAVE_MOBILE:
                 self.stream =  bluetooth.BluetoothSocket(bluetooth.RFCOMM)
@@ -26,6 +33,8 @@ class Stream(object):
             exit()
         
     def read(self, bytes=1):
+        """This method return the incoming bytes"""
+
         #missing = bytes
         data = ""
 
@@ -42,12 +51,17 @@ class Stream(object):
             pass
 
     def close(self):
+        """Close a connection"""
+        
         self.stream.close()    
 
     def getStream(self):
+        """Return the stream"""
+
         return self.stream
     
     def isOpen(self):
+        """Return the state of a connection"""
 
         if self.version == Version.MINDWAVE_MOBILE:
             return True

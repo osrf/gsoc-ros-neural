@@ -1,7 +1,9 @@
 <launch>
+	<arg name="addr" />
+
   	<node name="mindwave" pkg="mindwave_driver" type="mindwave_node.py" 
        output="screen" required="true">
- 	  <!-- please change address of your bluetooth -->
-	  <param name="addr" value="20:68:9D:70:CA:96" />
+ 	  <!-- please change to the  mac address of your mindwave-->
+	  <param name="addr" value="$(arg addr)"/>
 	</node>
 </launch>

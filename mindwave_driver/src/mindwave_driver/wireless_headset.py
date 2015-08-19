@@ -6,6 +6,15 @@ from stream import Stream
 from common import Version, BytesStatus
 
 class WirelessHeadset(Headset):
+    """This class represents the wireless version of the mindwave
+
+    Args:
+        dev: device link 
+        headset: the id of mindwave wireless version
+
+    It has the basic functionality to connect, autoconnect and disconnect
+
+    """
 
     def __init__(self, dev="/dev/ttyUSB0", headset_id=None):
 
@@ -26,12 +35,15 @@ class WirelessHeadset(Headset):
     #         self.stream = serial.Serial(self.device, self.baudrate, timeout=0.001, rtscts=True)
 
     def autoconnect(self):
-        #self.debug_hex(AUTOCONNECT)
+        """This method autoconnects to the mindwave every."""
+
         self.stream.getStream().write(BytesStatus.AUTOCONNECT)  
         #the dongle switch to autoconnect mode it must wait 10 second to connect any headset
         time.sleep(10)
 
     def connect(self):
+        """This method connects to the mindwave with the id."""
+
         if self.id is not None:
             # we send a byte to CONNECTED and other byte in hex of headset id
             self.stream.getStream().write(''.join([BytesStatus.CONNECT, self.id.decode('hex')]))
@@ -39,9 +51,13 @@ class WirelessHeadset(Headset):
             self.autoconnect()
 
     def disconnect(self):
+        """This method disconnects the mindwave."""
+
         self.stream.getStream().write(BytesStatus.DISCONNECT)
          
     def echo_raw(self):
+        """This method prints the raw data from mindwave."""
+        
         while 1:
             #time.sleep()
             data = self.stream.read(1)

@@ -7,7 +7,8 @@ catkin_python_setup()
 
 catkin_package(
   CATKIN_DEPENDS 
-    rospy 
+    rospy
+    mindwave_msgs 
 )
 
 install(

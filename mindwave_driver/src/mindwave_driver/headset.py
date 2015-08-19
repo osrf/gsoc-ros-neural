@@ -2,6 +2,13 @@ from parser import Parser
 from listener import DongleListener
 
 class Headset:
+    """The main class of any version of headset
+
+    It has common values for both versions
+
+    Args:
+        id: the id of headset
+    """
 
     def __init__(self, headset_id=None):
         
@@ -23,6 +30,8 @@ class Headset:
         self.asig_eeg_power = []
         
     def run(self, stream):  # Stream class
+        """This method creates a Listener as a daemon."""
+
         self.stream = stream
 
         if self.stream is not None:
@@ -34,6 +43,8 @@ class Headset:
             self.listener.start()
 
     def close(self):
+        """This method closes the stream."""
+
         self.stream.close()
         
             

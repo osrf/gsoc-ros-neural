@@ -1,9 +1,12 @@
 <launch>
+	<arg name="dev" default="/tty/ttyUSB0" />
+	<arg name="bauterate" default="115200" />
+
   	<node name="mindwave" pkg="mindwave_driver" type="scripts/mindwave_node.py" 
        output="screen" respawn="true">
 	  <!-- default-->
-	  <param name="dev" value="/tty/ttyUSB0" />
-	  <param name="bauterate" value="115200" />
+	  <param name="dev" value="$(arg dev)" />
+	  <param name="bauterate" value="$(arg bauterate)" />
 
 	</node>
 </launch>

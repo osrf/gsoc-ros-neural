@@ -9,6 +9,9 @@ import csv		#writing CV files.
 import os 		#used to get directory for image topics
 import roslib 
 
+"""This script converts a bag file of joint states to a waypoints
+    
+"""
 def run():
     if len(sys.argv) != 2:
         sys.stderr.write('[ERROR] This script only takes input bag file as argument.n')

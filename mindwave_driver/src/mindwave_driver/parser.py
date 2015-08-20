@@ -85,7 +85,8 @@ class Parser(object):
                 else:
                    data = data[1:]
 
-            except IndexError:
+            except IndexError, e:
+                print e
                 pass
 
     def parser_payload(self, payload):

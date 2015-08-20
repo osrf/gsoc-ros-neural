@@ -10,7 +10,7 @@ from mindwave_driver.common import *
 from mindwave_msgs.msg import Mindwave
 
 class MindwaveNode:
-    """the Ros node for Mindwave message"""
+    """the Ros node class for the Mindwave messages"""
 
     def __init__(self):
         
@@ -31,9 +31,9 @@ class MindwaveNode:
         rospy.loginfo("Publishing the ros message for mindwave at addr %s ...", self.addr)
 
     def update(self):
-        """This method publishes the Mindwave ros message
+        """This method publishes the Mindwave ros messages
 
-        It publishes the Attention and Meditation values, these are
+        It publishes Attention and Meditation values, these are
         the main messages to control robots.
         """
 

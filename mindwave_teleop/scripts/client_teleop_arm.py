@@ -8,9 +8,6 @@ import sys
 import pdb
 import tf
 
-roslib.load_manifest('mindwave_teleop')
-
-
 from mindwave_msgs.srv import ExecuteCartesianIKTrajectory
 from geometry_msgs.msg import Pose
 

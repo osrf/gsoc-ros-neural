@@ -12,12 +12,16 @@
 
 using namespace std;
 
-// https://github.com/uos/katana_driver/blob/indigo_catkin/katana_tutorials/src/follow_joint_trajectory_client.cpp
 typedef  vector< vector <double> > Trajectory;
 typedef actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction> TrajClient;
 
 static const std::string FOLLOW_JOINT_NAME = "/arm_controller/follow_joint_trajectory";
 
+/*
+  This class allows to publish a ROS service to moving an Arm 
+  using the Joint Trajectory Action interface with a set of waypoints.
+
+*/
 class Trajectories
 {
 
@@ -29,12 +33,12 @@ public:
 
     Trajectories()
     {
-        // creates the action client
-        // true causes the client to spin its own thread
-        traj_client = new TrajClient(FOLLOW_JOINT_NAME, true);
+      // creates the action client
+      // true causes the client to spin its own thread
+      traj_client = new TrajClient(FOLLOW_JOINT_NAME, true);
 
-        // wait for the action server to start
-        traj_client->waitForServer(); //will wait for infinite time
+      // wait for the action server to start
+      traj_client->waitForServer(); //will wait for infinite time
     }
 
     ~Trajectories()
@@ -42,32 +46,41 @@ public:
         delete traj_client;
     }
 
+    /*
+      This method executes a trajectory in a .csv file
+    */
     std::string exec(std::string file)
     {
-        ROS_INFO("Action server started, sending goal.");
-        trajectory = readFile (file);
-        if (trajectory.size() == 0) return "trajectory file not found";
+      ROS_INFO("Action server started, sending goal.");
+      trajectory = readFile (file);
 
-        // send a goal to the action;
-        traj_client->sendGoal( buildGoal (trajectory) );
+      if (trajectory.size() == 0) return "trajectory file not found";
 
-        //wait for the action to return
-        bool finished_before_timeout = traj_client->waitForResult(ros::Duration(5.0));
+      // send a goal to the action;
+      traj_client->sendGoal( buildGoal (trajectory) );
 
-        if (finished_before_timeout)
-        {
-          actionlib::SimpleClientGoalState state = traj_client->getState();
-          ROS_INFO("Action finished: %s",state.toString().c_str());
-        }
-        else
-        {
-          ROS_INFO("Action did not finish before the time out.");
-          return "timeout";
-        }
+      //wait for the action to return
+      bool finished_before_timeout = traj_client->waitForResult(ros::Duration(10.0));
+      
+      actionlib::SimpleClientGoalState current_state = traj_client->getState();
 
-        return "ok";
+      if (finished_before_timeout)
+      {
+        ROS_INFO("Action finished: %s", current_state.toString().c_str());
+      }
+      else
+      {
+        ROS_INFO("Action did not finish before the time out.");
+        //traj_client.cancelGoal();
+        return "timeout";
+      }
+
+      return "ok";
     }
-
+    
+    /*
+      This function prints the Trajectory matrix of points
+    */
     void printTraj(Trajectory trajectory)
     {
       ROS_INFO("Printing list of points of the trajectory.");
@@ -93,6 +106,9 @@ public:
       return trajectory;
     }
 
+    /*
+      This function reads a .csv file to load a vector matrix 
+    */
     Trajectory readFile (std::string fileName)
     {
       Trajectory listOfPoints;
@@ -131,20 +147,26 @@ public:
       return listOfPoints;    
     }
 
-    //! Returns the current state of the action
-    actionlib::SimpleClientGoalState getState()
+    /* 
+      Return the current state of the current action
+    */
+    std::string getState()
     {
-      return traj_client->getState();
+      return traj_client->getState().toString();
     }
 
  private:
+    /*
+      This function builds the trajectory to follow the endeffector 
+      according to Universal Robot joints to execute a matrix of points
+    */
     control_msgs::FollowJointTrajectoryGoal buildGoal ( Trajectory trajectory)
     {
         
         control_msgs::FollowJointTrajectoryGoal goal;
 
         goal.trajectory.header.stamp = ros::Time::now()  + ros::Duration(1.0);
-        goal.trajectory.header.frame_id = "link_base";
+        goal.trajectory.header.frame_id = "base_link";
 
         // First, the joint names, which apply to all waypoints for Universal Robots
         goal.trajectory.joint_names.push_back("shoulder_pan_joint");
@@ -198,24 +220,28 @@ public:
 
 };
 
-
+/*
+  Request callback function for the service node
+*/
 bool trajectory_execution_callback(mindwave_execute_trajectory::ExecTraj::Request &req,
                                    mindwave_execute_trajectory::ExecTraj::Response &res)
 {
     Trajectories traj;
-  
+    
     if (traj.exec(req.file) == "ok")
     {
+       res.state = traj.getState();
       return true;
-    }
-
+    }else
+       res.state = traj.getState();
+       
     return false;
 }
 
 
 int main (int argc, char **argv)
 {
-  ros::init(argc, argv, "reproduce_trajectory");
+  ros::init(argc, argv, "execute_trajectory");
 
   ROS_INFO("Waiting for action server to start.");
 
@@ -230,6 +256,8 @@ int main (int argc, char **argv)
   // Start the service
   ros::NodeHandle n;
   ros::ServiceServer service = n.advertiseService("execute_trajectory", &trajectory_execution_callback);
+  //ros::ServiceServer srvstate = n.advertiseService("state_trajectory", trajectory_state_callback);
+
   ROS_INFO("Ready execute trajectories");
   ros::spin();
 

@@ -4,10 +4,10 @@
 
 #include <string>
 
-#include <robotiq_s_model_articulated_msgs/SModelRobotInput.h>
-#include <robotiq_s_model_articulated_msgs/SModelRobotOutput.h>
-//#include <robotiq_msgs/SModelRobotInput.h>
-//#include <robotiq_msgs/SModelRobotOutput.h>
+//#include <robotiq_s_model_articulated_msgs/SModelRobotInput.h>
+//#include <robotiq_s_model_articulated_msgs/SModelRobotOutput.h>
+#include <robotiq_msgs/SModelRobotInput.h>
+#include <robotiq_msgs/SModelRobotOutput.h>
 
 
 #include <mindwave_msgs/Mindwave.h>
@@ -17,6 +17,8 @@
  This node class executes a predefined trajectory and
  interoperate with Mindwave message.
 */
+
+using namespace std;
 
 class ArmTeleop
 {
@@ -28,7 +30,8 @@ class ArmTeleop
   ros::ServiceClient traj_client;
   mindwave_execute_trajectory::ExecTraj trajectory;
 
-  robotiq_s_model_articulated_msgs::SModelRobotOutput cmd; 
+  //robotiq_s_model_articulated_msgs::SModelRobotOutput cmd; 
+  robotiq_msgs::SModelRobotOutput cmd; 
 
   int m_threshold;
   int a_threshold;
@@ -36,7 +39,9 @@ class ArmTeleop
   bool positioned;
 
 
-  const std::string trajFiles[2]={"pick2.csv", "place2.csv"};
+  //const std::string trajFiles[2]={"pick2.csv", "place2.csv"};
+  string trajFiles[2];
+  string pick_traj, place_traj;
 
   public: 
   ArmTeleop()
@@ -46,26 +51,31 @@ class ArmTeleop
 
     n.param<int>("meditation_threshold", m_threshold, 80);
     n.param<int>("attention_threshold", a_threshold, 50);
+    n.getParam("pick", pick_traj);
+    n.getParam("place", place_traj);
 
     picked = false;
     positioned = false;
 
-    sub = nh.subscribe<mindwave_msgs::Mindwave>("/mindwave", 1, &ArmTeleop::mindwaveCallback, this);
-    pub = nh.advertise<robotiq_s_model_articulated_msgs::SModelRobotOutput>("left_hand/command", 10);
-    
-    // Start the service
-    ros::NodeHandle nh;
+    if (pick_traj != "" || place_traj !="")
+    { 
+      trajFiles[0]= pick_traj;
+      trajFiles[1]= place_traj;
 
-    traj_client = nh.serviceClient<mindwave_execute_trajectory::ExecTraj>("/execute_trajectory");
+      sub = nh.subscribe<mindwave_msgs::Mindwave>("/mindwave", 1, &ArmTeleop::mindwaveCallback, this);
+      //pub = nh.advertise<robotiq_s_model_articulated_msgs::SModelRobotOutput>("left_hand/command", 10);
+      pub = nh.advertise<robotiq_msgs::SModelRobotOutput>("left_hand/command", 10);
+      
+      // Start the service
+      ros::NodeHandle nh;
 
-    //trajectory.request.file = ros::package::getPath("mindwave_execute_trajectory") + 
-                                "/config/" + trajFiles[0];
+      traj_client = nh.serviceClient<mindwave_execute_trajectory::ExecTraj>("/execute_trajectory");
 
-    //mindwave_execute_trajectory::ExecTraj trajectory;
+      control_gripper(true);
 
-    ROS_INFO("Executing a predefined trajectory %s", trajFiles[0].c_str()); 
-
-    control_gripper(true);
+    } else{
+      ROS_INFO("Not trajectory file found, please review that.");
+    } 
 
   }
   
@@ -73,51 +83,68 @@ class ArmTeleop
   
   void mindwaveCallback(const mindwave_msgs::Mindwave msg){
     
+    string state = trajectory.response.state;
 
     if(msg.attention >= a_threshold && !picked && !positioned)  
     {
-      
+      control_gripper(true);
+
       trajectory.request.file = ros::package::getPath("mindwave_execute_trajectory") + 
                                 "/config/" + trajFiles[0];
+      ROS_INFO("Executing trajectory %s", trajFiles[0].c_str());
 
       if (!traj_client.call(trajectory))
       { 
           ROS_ERROR ("Failed to execute [%s] trajectory", trajFiles[0].c_str());
           //break;
       }
-
-      usleep(100000);
+      usleep(50000);
+      
       positioned = true;
+      picked = false;
 
-    } if(msg.meditation >= m_threshold && !picked && positioned)
+      ROS_INFO("Current State %s", trajectory.response.state.c_str());
+
+    } 
+
+    // if the gol does not finish yet
+
+    //if(msg.meditation >= m_threshold && !picked && positioned && state=="SUCCEEDED")
+    if(msg.meditation >= m_threshold && !picked && positioned)
     {
       // close that hand
       control_gripper(false);
       picked = true;
     }
+
+    //ROS_INFO("DEBUG Current State %s", trajectory.response.state.c_str());
     
     if(msg.attention >= a_threshold && picked && positioned)  
     {
 
       trajectory.request.file = ros::package::getPath("mindwave_execute_trajectory") + 
                                 "/config/" + trajFiles[1];
-
+      ROS_INFO("Executing trajectory %s", trajFiles[1].c_str());
+      
       if (!traj_client.call(trajectory))
       { 
           ROS_ERROR ("Failed to execute [%s] trajectory", trajFiles[1].c_str());
           //break;
       }
 
-      usleep(100000);
+      usleep(50000);
 
-      positioned = false;
+      positioned = true;
+      //picked = false;
 
-    } if (msg.meditation >= m_threshold && picked && !positioned)
+    } 
+
+    if (msg.meditation >= m_threshold && picked && positioned)
     {
       control_gripper(true);
       picked = false;
+      positioned = false;
     }
-     
 
   } 
 
@@ -128,14 +155,14 @@ class ArmTeleop
       // publish the rostopic to open hand
       //rostopic pub --once left_hand/command robotiq_s_model_articulated_msgs/SModelRobotOutput {1,0,1,0,0,0,0,255,0,155,0,0,255,0,0,0,0,0}
       cmd.rACT = 1;
-      cmd.rMOD = 1;
+      cmd.rMOD = 0;
       cmd.rGTO = 1;
       cmd.rATR = 0;
       cmd.rICF = 0;
       cmd.rICS = 0;
       cmd.rPRA = 0; // open, close
       cmd.rSPA = 255; // speed 22~110
-      cmd.rFRA = 255; // force 15~60
+      cmd.rFRA = 150; // force 15~60
       cmd.rPRB = 155; 
       cmd.rSPB = 0;
       cmd.rFRB = 0;
@@ -157,7 +184,7 @@ class ArmTeleop
       cmd.rICS = 0;
       cmd.rPRA = 150;
       cmd.rSPA = 255;
-      cmd.rFRA = 0;
+      cmd.rFRA = 255;
       cmd.rPRB = 155;
       cmd.rSPB = 0;
       cmd.rFRB = 0;

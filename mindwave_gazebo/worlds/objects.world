@@ -29,14 +29,14 @@
       <pose>0.614193 0.287024 0.952017 0.0 0.0 0.0</pose>
       <link name='cylinder_object'>
         <inertial>
-          <mass>0.5</mass>
+          <mass>10</mass>
           <inertia>
-            <ixx>1</ixx>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyy>1</iyy>
-            <iyz>0</iyz>
-            <izz>1</izz>
+            <ixx>0.4</ixx>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyy>0.4</iyy>
+            <iyz>0.0</iyz>
+            <izz>0.2</izz>
           </inertia>
         </inertial>
         <collision name='collision'>
@@ -48,17 +48,17 @@
           </geometry>
           <max_contacts>10</max_contacts>
           <surface>
-            <contact>
+            <!--<contact>
               <ode/>
-            </contact>
-            <bounce/>
+            </contact> 
+            <bounce/> -->
             <friction>        
               <ode>
-                <mu>50.000000</mu>
-                <mu2>50.000000</mu2>
-                <fdir1>0.000000 0.000000 0.000000</fdir1>
+                <mu>1.1</mu>
+                <mu2>1.1</mu2>
+                <!--<fdir1>0.000000 0.000000 0.000000</fdir1>
                 <slip1>0.000000</slip1>
-                <slip2>0.000000</slip2>
+                <slip2>0.000000</slip2>-->
               </ode>
             </friction>
           </surface>

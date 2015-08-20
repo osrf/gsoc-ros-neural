@@ -1,10 +1,15 @@
 /*
- * Steve Ataucuri
+ * Autor: Steve Ataucuri
 */
 
 #include <ros/ros.h>
 #include <geometry_msgs/Twist.h>
 #include <mindwave_msgs/Mindwave.h>
+
+/*
+  This class allows to teleoperate a Quaqcopter robot with
+  the Mindwave headset
+*/
 
 class QuadcopterTeleop
 {
@@ -21,6 +26,9 @@ class QuadcopterTeleop
   double x_vel,y_vel,z_vel, yaw_vel;  double default_yaw;
 
   public: 
+  /*
+    Constructor method's that subscribe to /mindwave topic   
+  */
   QuadcopterTeleop()
   { 
     vel.linear.x = vel.linear.y = vel.angular.z = 0;
@@ -44,7 +52,17 @@ class QuadcopterTeleop
   }
   
   ~QuadcopterTeleop()   { }
-  
+
+  /*
+    This method publishes a rostopic /cmd_vel with angular and linealvelocities 
+    to move a quadcopter. When the user concentrate or meditate can move the 
+    robot.
+    This method moves the robot with a threshold value in the launch file
+
+    Param:
+      msg : ROS message with meditation and attention values  
+
+  */  
   void mindwaveCallback(const mindwave_msgs::Mindwave msg){
     
     vel.linear.x = vel.linear.y = vel.angular.z = 0;

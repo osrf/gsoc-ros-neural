@@ -60,7 +60,7 @@ public:
       traj_client->sendGoal( buildGoal (trajectory) );
 
       //wait for the action to return
-      bool finished_before_timeout = traj_client->waitForResult(ros::Duration(10.0));
+      bool finished_before_timeout = traj_client->waitForResult(ros::Duration(15.0));
       
       actionlib::SimpleClientGoalState current_state = traj_client->getState();
 
@@ -148,7 +148,7 @@ public:
     }
 
     /* 
-      Return the current state of the current action
+      Return the current state of the goal action
     */
     std::string getState()
     {
@@ -158,7 +158,7 @@ public:
  private:
     /*
       This function builds the trajectory to follow the endeffector 
-      according to Universal Robot joints to execute a matrix of points
+      according to Universal Robot joints to execution of a matrix of points.
     */
     control_msgs::FollowJointTrajectoryGoal buildGoal ( Trajectory trajectory)
     {
@@ -221,7 +221,7 @@ public:
 };
 
 /*
-  Request callback function for the service node
+  Request callback function to calling the service node
 */
 bool trajectory_execution_callback(mindwave_execute_trajectory::ExecTraj::Request &req,
                                    mindwave_execute_trajectory::ExecTraj::Response &res)
@@ -256,7 +256,6 @@ int main (int argc, char **argv)
   // Start the service
   ros::NodeHandle n;
   ros::ServiceServer service = n.advertiseService("execute_trajectory", &trajectory_execution_callback);
-  //ros::ServiceServer srvstate = n.advertiseService("state_trajectory", trajectory_state_callback);
 
   ROS_INFO("Ready execute trajectories");
   ros::spin();

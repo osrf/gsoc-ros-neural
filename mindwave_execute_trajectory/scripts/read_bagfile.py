@@ -9,8 +9,9 @@ import csv		#writing CV files.
 import os 		#used to get directory for image topics
 import roslib 
 
-"""This script converts a bag file of joint states to a waypoints
-    
+"""
+    This script converts a bag file of joint states to a set of waypoints.
+    You need to record a bag file.    
 """
 def run():
     if len(sys.argv) != 2:

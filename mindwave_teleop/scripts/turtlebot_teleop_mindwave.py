@@ -9,7 +9,18 @@ from mindwave_msgs.msg import Mindwave
 M_PI = 3.1415116
 
 class Turtlebot:
+    """
+    This class allows to teleoperate the turtlebot with
+    the Mindwave headset.
+    """
+
     def __init__(self):
+        """Init method
+        
+        This Subscribes to rostopic mindwave and create a publisher
+        of Twist message.
+
+        """
 
         rospy.init_node('turtle_teleop_mindwave', anonymous=True)
         
@@ -25,7 +36,19 @@ class Turtlebot:
         self.pub = rospy.Publisher('~cmd_vel', Twist, queue_size=10)    
 
     def mindwaveCallback(self, msg):
-    
+        """
+        This method publishes a rostopic Twist with angular and lineal velocities 
+        to move the turtlebot. 
+
+        When the user concentrate the robot goes fordward over x axes and
+        turn to left over z axes when the person meditates. You need to 
+        concentrate or meditate more higher than the threshold param in 
+        the launch file.
+
+        Param:
+            msg : ROS message with meditation and attention values  
+
+        """  
         twist = Twist()
 
         # Go fordward

@@ -13,13 +13,13 @@
 #include <mindwave_msgs/Mindwave.h>
 #include <mindwave_execute_trajectory/ExecTraj.h>
 
-/*
- This node class executes a predefined trajectory and
- interoperate with Mindwave message.
-*/
 
 using namespace std;
 
+/*
+  This class allows to teleoperate the robot arm with
+  the Mindwave headset
+*/
 class ArmTeleop
 {
   private:
@@ -30,7 +30,6 @@ class ArmTeleop
   ros::ServiceClient traj_client;
   mindwave_execute_trajectory::ExecTraj trajectory;
 
-  //robotiq_s_model_articulated_msgs::SModelRobotOutput cmd; 
   robotiq_msgs::SModelRobotOutput cmd; 
 
   int m_threshold;
@@ -38,8 +37,6 @@ class ArmTeleop
   bool picked;
   bool positioned;
 
-
-  //const std::string trajFiles[2]={"pick2.csv", "place2.csv"};
   string trajFiles[2];
   string pick_traj, place_traj;
 
@@ -63,7 +60,6 @@ class ArmTeleop
       trajFiles[1]= place_traj;
 
       sub = nh.subscribe<mindwave_msgs::Mindwave>("/mindwave", 1, &ArmTeleop::mindwaveCallback, this);
-      //pub = nh.advertise<robotiq_s_model_articulated_msgs::SModelRobotOutput>("left_hand/command", 10);
       pub = nh.advertise<robotiq_msgs::SModelRobotOutput>("left_hand/command", 10);
       
       // Start the service
@@ -81,6 +77,15 @@ class ArmTeleop
   
   ~ArmTeleop()   { }
   
+  /*
+    This method moves the arm to desired position calling to a service to execute
+    a predefined trajectory. When the user concentrate or meditate can move the 
+    arm
+
+    Param:
+      msg : ROS message with meditation and attention values  
+
+  */
   void mindwaveCallback(const mindwave_msgs::Mindwave msg){
     
     string state = trajectory.response.state;
@@ -98,7 +103,7 @@ class ArmTeleop
           ROS_ERROR ("Failed to execute [%s] trajectory", trajFiles[0].c_str());
           //break;
       }
-      usleep(50000);
+      usleep(500000);
       
       positioned = true;
       picked = false;
@@ -109,17 +114,17 @@ class ArmTeleop
 
     // if the gol does not finish yet
 
-    //if(msg.meditation >= m_threshold && !picked && positioned && state=="SUCCEEDED")
     if(msg.meditation >= m_threshold && !picked && positioned)
     {
-      // close that hand
+      // pick object up
       control_gripper(false);
       picked = true;
+      positioned = false;
     }
 
     //ROS_INFO("DEBUG Current State %s", trajectory.response.state.c_str());
     
-    if(msg.attention >= a_threshold && picked && positioned)  
+    if(msg.attention >= a_threshold && picked && !positioned)  
     {
 
       trajectory.request.file = ros::package::getPath("mindwave_execute_trajectory") + 
@@ -132,10 +137,10 @@ class ArmTeleop
           //break;
       }
 
-      usleep(50000);
+      usleep(500000);
 
       positioned = true;
-      //picked = false;
+      picked = true;
 
     } 
 
@@ -148,6 +153,12 @@ class ArmTeleop
 
   } 
 
+  /*
+    This function publishes a ros message for manipulation of the robotiq hand
+
+    Args:
+      open : if it is true then open the hand, if not then close 
+  */
   void control_gripper(bool open)
   {
         

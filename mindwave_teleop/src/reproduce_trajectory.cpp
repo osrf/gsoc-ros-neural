@@ -183,7 +183,6 @@ class ArmTeleop
       cmd.rPRS = 0;
       cmd.rSPS = 0;
       cmd.rFRS = 0;
-   
 
     }else // close hand
     {
@@ -197,10 +196,10 @@ class ArmTeleop
       cmd.rSPA = 255;
       cmd.rFRA = 255;
       cmd.rPRB = 155;
-      cmd.rSPB = 0;
+      cmd.rSPB = 255;
       cmd.rFRB = 0;
       cmd.rPRC = 255;
-      cmd.rSPC = 0;
+      cmd.rSPC = 255;
       cmd.rFRC = 0;
       cmd.rPRS = 0;
       cmd.rSPS = 0;

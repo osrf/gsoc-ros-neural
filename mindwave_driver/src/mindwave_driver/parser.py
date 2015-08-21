@@ -1,6 +1,6 @@
 
 def bigend_24b(self, b1, b2, b3):
-    """This function convert big endian bytes to readable value 0~255"""
+    """This function converts big endian bytes to readable value 0~255"""
     b1 = int(b1, 16)
     b2 = int(b2, 16)
     b3 = int(b3, 16)
@@ -9,7 +9,7 @@ def bigend_24b(self, b1, b2, b3):
     #return int(b1,16)*65536+int(b2,16)*256+int(b3,16)
 
 class Parser(object):
-    """The parser class for a chunk of data from the Mindwave 
+    """The parser class of data from the Mindwave 
 
     It parsers the data according to the mindwave protocol
     """
@@ -23,6 +23,8 @@ class Parser(object):
         return self
 
     def print_bytes(self, data):
+        """Print bytes"""
+        
        for b in data:
             print '0x%s, ' % b.encode('hex'),
 

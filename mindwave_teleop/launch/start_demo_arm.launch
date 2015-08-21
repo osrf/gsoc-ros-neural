@@ -7,8 +7,8 @@
 
   <node pkg ="mindwave_teleop" type="reproduce_trajectory_node" name="reproduce_trajectory_node"
         output="screen">
-	    <param name="attention_threshold" value="50" type="int"/>
-	   	<param name="meditation_threshold" value="75" type="int"/>
+	    <param name="attention_threshold" value="40" type="int"/>
+	   	<param name="meditation_threshold" value="65" type="int"/>
 	   	<param name="pick" type="string" value="$(arg pick)" />
 	   	<param name="place" type="string" value="$(arg place)" />
   </node>

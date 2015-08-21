@@ -8,9 +8,6 @@ Repository for the GSOC 2015 Neural Interfaces for ROS project, sponsored by OSR
 * Project title: Neural Interfaces for ROS/Gazebo project
 * Project link: http://www.google-melange.com/gsoc/project/details/google/gsoc2015/stonescenter/5878405773918208
 * Additional information: stonescenter.wordpress.com
-* Wiki page: You can see additional info at [ 
-Wiki](https://github.com/jacquelinekay/gsoc-ros-neural/wiki/GSoC-2015-Steve-Ataucuri)
-* Step-by-Steps: please go to [Steps](https://github.com/osrf/gsoc-ros-neural/wiki/Steps-to-Control-a-robot-in-Gazebo)
 
 ### What is this repository for? ###
   
@@ -30,3 +27,10 @@ In order to be able to run the nodes, it is necessary clone or install some pack
 * **mindwave_teleop:** ROS nodes to teleop some robots into Gazebo
 * **mindwave_msgs:** ROS message for Mindwave driver
 * **mindwave_gazebo:** Default world for Gazebo
+
+### Documentation ###
+
+* Step-by-step: please go to [Controling the turtlebot](https://github.com/osrf/gsoc-ros-neural/wiki/Steps-to-Control-a-robot-in-Gazebo)
+* Step-by-step: please go to [Moving the robot arm](https://github.com/osrf/gsoc-ros-neural/wiki/Moving-an-Arm-manipulator)
+* Reports : you can see additional info at [ 
+Wiki](https://github.com/jacquelinekay/gsoc-ros-neural/wiki/GSoC-2015-Steve-Ataucuri)

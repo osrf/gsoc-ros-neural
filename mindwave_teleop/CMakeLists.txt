@@ -38,12 +38,6 @@ catkin_package(
 add_executable(quadcopter_teleop_mindwave src/quadcopter_teleop_mindwave.cpp)
 target_link_libraries(quadcopter_teleop_mindwave ${catkin_LIBRARIES})
 
-add_executable(ur10_ik_move_arm src/ur10_ik_move_arm.cpp)
-target_link_libraries(ur10_ik_move_arm ${catkin_LIBRARIES})
-
-add_executable(ur10_simple_move_arm src/ur10_simple_move_arm.cpp)
-target_link_libraries(ur10_simple_move_arm ${catkin_LIBRARIES})
-
 add_executable(reproduce_trajectory_node src/reproduce_trajectory.cpp)
 target_link_libraries(reproduce_trajectory_node ${catkin_LIBRARIES})
 
@@ -62,7 +56,7 @@ install(PROGRAMS
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-install(TARGETS quadcopter_teleop_mindwave ur10_ik_move_arm ur10_simple_move_arm reproduce_trajectory_node
+install(TARGETS quadcopter_teleop_mindwave reproduce_trajectory_node
 	DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

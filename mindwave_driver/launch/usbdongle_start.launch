@@ -1,12 +1,16 @@
 <launch>
+ 	<!-- the bluetooth version of mindwave headset -->
+	<arg name="version" default="wireless" />
+
 	<arg name="dev" default="/tty/ttyUSB0" />
 	<arg name="bauterate" default="115200" />
 
-  	<node name="mindwave" pkg="mindwave_driver" type="scripts/mindwave_node.py" 
+  	<node name="mindwave" pkg="mindwave_driver" type="mindwave_node.py" 
        output="screen" respawn="true">
-	  <!-- default-->
-	  <param name="dev" value="$(arg dev)" />
-	  <param name="bauterate" value="$(arg bauterate)" />
+    	<param name="version" value="$(arg version)"/>
+	  	<!-- default-->
+	  	<param name="dev" value="$(arg dev)" />
+	  	<param name="bauterate" value="$(arg bauterate)" />
 
 	</node>
 </launch>

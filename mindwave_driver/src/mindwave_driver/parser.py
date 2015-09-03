@@ -24,8 +24,7 @@ class Parser(object):
 
     def print_bytes(self, data):
         """Print bytes"""
-        
-       for b in data:
+        for b in data:
             print '0x%s, ' % b.encode('hex'),
 
     def parser(self, data):

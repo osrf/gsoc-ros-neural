@@ -1,8 +1,12 @@
 <launch>
+ 	<!-- the bluetooth version of mindwave headset -->
+	<arg name="version" default="bluetooth" />
+
 	<arg name="addr" />
 
   	<node name="mindwave" pkg="mindwave_driver" type="mindwave_node.py" 
        output="screen" required="true">
+      <param name="version" value="$(arg version)"/>
  	  <!-- please change to the  mac address of your mindwave-->
 	  <param name="addr" value="$(arg addr)"/>
 	</node>

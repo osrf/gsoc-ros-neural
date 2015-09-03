@@ -16,19 +16,28 @@ class MindwaveNode:
         
         rospy.init_node('mindwave_node', anonymous=True)     
         
-        self.addr = rospy.get_param("~addr", None)
-        
-        if self.addr is not None:
-            self.headset = BluetoothHeadset(self.addr)
-        else:
-            self.headset = BluetoothHeadset()
-            self.addr = self.headset.addr
+        self.version = rospy.get_param("~version", None)
 
+        if self.version == "bluetooth":
+            self.addr = rospy.get_param("~addr", None)
+
+            if self.addr is not None:
+                self.headset = BluetoothHeadset(self.addr)
+            else:
+                self.headset = BluetoothHeadset()
+                self.addr = self.headset.addr
+                       
+        elif self.version == "wireless": # no implemented yet
+            pass    
+
+        #rospy.loginfo("Please you must specified the kind of mindwave version")
+        #sys.exit(-1)
+        
         self.pub = rospy.Publisher('mindwave', Mindwave, queue_size=10)
         
         self.loop_rate = rospy.Rate(10)
-
         rospy.loginfo("Publishing the ros message for mindwave at addr %s ...", self.addr)
+        
 
     def update(self):
         """This method publishes the Mindwave ros messages

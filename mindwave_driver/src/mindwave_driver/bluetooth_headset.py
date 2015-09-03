@@ -61,7 +61,7 @@ class BluetoothHeadset(Headset):
             except BluetoothError, e:
                 self.status = Status.DISCONNECTED
                 print "Connection error: ", e, "Retrying in 5 secs.."
-                print "Are you sure the address " + self.addr + " is correct?, we found other: ", self.find() 
+                #print "Are you sure the address " + self.addr + " is correct?, we found other: ", self.find() 
                 
                 # we try to open again
                 if tried == 5:

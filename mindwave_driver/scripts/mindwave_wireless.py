@@ -2,11 +2,11 @@
 
 import time
 
-from mindwave.wireless_headset import WirelessHeadset
-from mindwave.common import *
+from mindwave_driver.wireless_headset import WirelessHeadset
+from mindwave_driver.common import *
 
-#headset = Mindwave('/dev/ttyUSB0')
-headset = WirelessHeadset(r'\\.\COM17','7B04') # windows r'\\.\COMx'
+headset = WirelessHeadset('/dev/ttyUSB0','7B04', 115200)
+#headset = WirelessHeadset(r'\\.\COM17','7B04') # windows r'\\.\COMx'
 #headset.echo_raw()
 
 while True:

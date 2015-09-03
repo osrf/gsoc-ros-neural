@@ -16,13 +16,14 @@ class WirelessHeadset(Headset):
 
     """
 
-    def __init__(self, dev="/dev/ttyUSB0", headset_id=None):
+    def __init__(self, dev=None, headset_id=None, rate=None):
 
         Headset.__init__(self, headset_id)
 
         self.device = dev
-        
-        self.stream = Stream(device=dev, version=Version.MINDWAVE)
+        self.bauderate = rate
+
+        self.stream = Stream(device=self.device, bauderate=rate, version=Version.MINDWAVE)
         time.sleep(2)
 
         self.connect()

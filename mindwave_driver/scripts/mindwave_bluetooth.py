@@ -27,4 +27,4 @@ while True:
         print ""
     else:
         pass
-    time.sleep(0.2)
+    time.sleep(0.25)
